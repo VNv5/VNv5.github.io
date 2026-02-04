@@ -3,22 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>kahoot</title>
+    <title>Kahoot</title>
     <style>
         html, body {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
+            overflow: hidden; /* Prevent page scrollbars */
         }
         iframe {
             width: 100%;
             height: 100%;
-            border: none;
+            border: none; /* Clean, no border */
         }
     </style>
 </head>
 <body>
-    <iframe src="kahoot.my" title="kahoot"></iframe>
+
+<!-- Main Kahoot embed -->
+<iframe id="kahootFrame" src="https://kahoot.my" title="Kahoot"></iframe>
+
+<script>
+    const iframe = document.getElementById("kahootFrame");
+
+    // Paths to block
+    const blockedPaths = [
+        "/$/credits/",
+        "/$/dmca/",
+        "/$/privacy/"
+    ];
+
+    // Check iframe URL every 500ms
+    setInterval(() => {
+        try {
+            const currentPath = iframe.contentWindow.location.pathname;
+
+            if (blockedPaths.includes(currentPath)) {
+                iframe.src = "https://kahoot.my"; // Redirect back
+            }
+        } catch (e) {
+            // Cross-origin restrictions can throw errors; we ignore them
+        }
+    }, 500);
+</script>
+
 </body>
 </html>
