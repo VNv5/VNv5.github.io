@@ -7,17 +7,18 @@
 }
 
 body {
-  background: #fff;
-  color: #333;
+  background: #000; /* dark base */
+  color: #fff;
   line-height: 1.6;
+  padding-bottom: 100px; /* space for utility bar */
 }
 
 /* ---- Header ---- */
 .site-header {
   text-align: center;
   padding: 20px 0;
-  background: #fff;
-  border-bottom: 1px solid #eaeaea;
+  background: #111;
+  border-bottom: 2px solid #e65c00;
 }
 
 .logo {
@@ -27,13 +28,15 @@ body {
 
 /* ---- Hero Section ---- */
 .hero {
-  height: 80vh;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   text-align: center;
   padding: 40px;
-  background: #fafafa;
+  background: linear-gradient(135deg, #e65c00, #000);
+  color: #fff;
 }
 
 .hero h1 {
@@ -45,38 +48,43 @@ body {
 .hero p {
   font-size: 1.2rem;
   margin-bottom: 20px;
-  color: #555;
+  color: #fff;
 }
 
 .btn-primary {
   display: inline-block;
   padding: 12px 24px;
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #e65c00;
   text-decoration: none;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: background 0.25s ease;
+  font-weight: 700;
+  border-radius: 50px;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 10px #e65c00, 0 0 20px #e65c00;
 }
 
 .btn-primary:hover {
-  background: #444;
+  background: #e65c00;
+  color: #fff;
+  box-shadow: 0 0 20px #fff, 0 0 40px #fff;
 }
 
 /* ---- About Section ---- */
 .about-section {
   padding: 60px 20px;
   text-align: center;
+  background: #111;
 }
 
 .about-section h2 {
   font-size: 2.4rem;
   margin-bottom: 12px;
+  color: #e65c00;
 }
 
 .about-section p {
   font-size: 1rem;
-  color: #666;
+  color: #ddd;
   max-width: 700px;
   margin: auto;
 }
@@ -86,6 +94,65 @@ body {
   text-align: center;
   padding: 18px 0;
   font-size: 0.9rem;
-  background: #f4f4f4;
+  background: #111;
   color: #777;
+}
+
+/* ---- Utility Bar ---- */
+.utility-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  border-radius: 50px;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 15px #e65c00, 0 0 30px rgba(230, 92, 0, 0.5);
+  z-index: 1000;
+}
+
+.utility-bar .utility-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.utility-bar .utility-icon img {
+  width: 28px;
+  height: 28px;
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ---- Hover Effects ---- */
+.utility-bar .utility-icon:hover {
+  background: #e65c00;
+  box-shadow: 0 0 15px #e65c00, 0 0 30px rgba(230, 92, 0, 0.5);
+  transform: scale(1.1);
+}
+
+.utility-bar .utility-icon:hover img {
+  filter: invert(0%) sepia(100%) saturate(500%) hue-rotate(10deg) brightness(100%) contrast(100%);
+  transform: scale(1.2);
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+}
+
+/* ---- Active Icon ---- */
+.utility-bar .utility-icon.active {
+  background: #e65c00;
+  box-shadow: 0 0 20px #e65c00, 0 0 40px rgba(230, 92, 0, 0.7);
+}
+
+.utility-bar .utility-icon.active img {
+  filter: invert(0%) sepia(100%) saturate(500%) hue-rotate(10deg) brightness(100%) contrast(100%);
+  transform: scale(1.2);
+  box-shadow: 0 0 15px #fff, 0 0 30px #fff;
 }
