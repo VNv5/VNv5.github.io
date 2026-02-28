@@ -43,7 +43,7 @@
 
     utilityIcons.forEach(icon => {
       const linkPage = icon.getAttribute("href").split("/").pop();
-      if(linkPage === currentPage){
+      if(linkPage === currentPage || (currentPage === "" && linkPage === "index.html")){
         icon.classList.add("active");
       }
 
