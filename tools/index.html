@@ -20,7 +20,7 @@
   <main>
     <section class="hero">
       <h1>Tools</h1>
-      <p>Access all your tools here.</p>
+      <p>All your tools in one place.</p>
       <a href="../index.html" class="btn-primary">Home</a>
     </section>
   </main>
@@ -43,6 +43,7 @@
 
     utilityIcons.forEach(icon => {
       const linkPage = icon.getAttribute("href").split("/").pop();
+      icon.classList.remove("active");
       if(linkPage === currentPage || (currentPage === "" && linkPage === "index.html")){
         icon.classList.add("active");
       }
