@@ -1,3 +1,105 @@
+/* ---- Global ---- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  line-height: 1.6;
+  padding-bottom: 140px; /* space for floating utility bar */
+}
+
+/* ---- Header ---- */
+.site-header {
+  text-align: center;
+  padding: 20px 0;
+  background: #111;
+  border-bottom: 2px solid #e65c00;
+}
+
+.logo-container {}
+
+.logo {
+  height: 160px; /* slightly bigger header logo */
+  width: auto;
+}
+
+/* ---- Hero Section ---- */
+.hero {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+  background: linear-gradient(135deg, #e65c00, #000);
+  color: #fff;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #fff;
+  color: #e65c00;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 50px;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 10px #e65c00, 0 0 20px #e65c00;
+}
+
+.btn-primary:hover {
+  background: #e65c00;
+  color: #fff;
+  box-shadow: 0 0 20px #fff, 0 0 40px #fff;
+}
+
+/* ---- About Section ---- */
+.about-section {
+  padding: 60px 20px;
+  text-align: center;
+  background: #111;
+}
+
+.about-section h2 {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  color: #e65c00;
+}
+
+.about-section p {
+  font-size: 1rem;
+  color: #ddd;
+  max-width: 700px;
+  margin: auto;
+}
+
+/* ---- Footer ---- */
+.site-footer {
+  text-align: center;
+  padding: 18px 0;
+  font-size: 0.9rem;
+  background: #111;
+  color: #777;
+}
+
 /* ---- Floating Utility Bar ---- */
 .utility-bar {
   position: fixed;
@@ -34,6 +136,8 @@
   height: 70px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: transparent;
+  transition: transform 0.2s ease;
 }
 
 /* Icon images */
@@ -41,6 +145,7 @@
   width: 40px;
   height: 40px;
   transition: transform 0.2s ease, filter 0.2s ease;
+  filter: none;
 }
 
 /* Hover glow (stronger) */
@@ -57,9 +162,4 @@
   transform: scale(1.2);
   filter: drop-shadow(0 0 4px #e65c00)
           drop-shadow(0 0 12px #e65c00);
-}
-
-/* Prevent content from being hidden behind bar */
-body {
-  padding-bottom: 140px;
 }
