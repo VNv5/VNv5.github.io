@@ -3,24 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Carey Network</title>
-<link rel="stylesheet" href="css/style.css">
+<title>Tools</title>
+<link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 
 <header class="site-header">
-<img src="images/logo.png" class="logo">
+<img src="../images/logo.png" class="logo">
 </header>
 
-<main>
-<section class="hero">
-<h1>Welcome to The Carey Network</h1>
-<p>Connecting you to apps, tools, games, and more.</p>
-<a href="apps/index.html" class="btn-primary">Explore</a>
-</section>
-</main>
+<main></main>
 
-<!-- NAV LOAD -->
 <div id="nav-container"></div>
 
 <footer class="site-footer">
@@ -38,7 +31,7 @@ async function loadNav() {
 
   utilityIcons.forEach(icon => {
     const linkPage = icon.getAttribute("href").split("/").pop();
-    if (linkPage === currentPage || (currentPage === "" && linkPage === "index.html")) {
+    if (linkPage === currentPage) {
       icon.classList.add("active");
     }
   });
@@ -47,23 +40,6 @@ async function loadNav() {
 document.addEventListener("DOMContentLoaded", function () {
   document.body.classList.add("fade-in");
   loadNav();
-
-  document.querySelectorAll("a").forEach(link => {
-    if (link.hostname === window.location.hostname) {
-      link.addEventListener("click", function (e) {
-        if (this.href !== window.location.href) {
-          e.preventDefault();
-          const target = this.href;
-
-          document.body.classList.add("fade-out");
-
-          setTimeout(() => {
-            window.location.href = target;
-          }, 300);
-        }
-      });
-    }
-  });
 });
 </script>
 
