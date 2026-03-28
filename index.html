@@ -21,7 +21,7 @@
 </main>
 
 <nav class="utility-bar">
-<a href="index.html" class="utility-icon active"><img src="images/icon.png"></a>
+<a href="index.html" class="utility-icon"><img src="images/icon.png"></a>
 <a href="games/index.html" class="utility-icon"><img src="images/games.png"></a>
 <a href="apps/index.html" class="utility-icon"><img src="images/apps.png"></a>
 <a href="settings/index.html" class="utility-icon"><img src="images/settings.png"></a>
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
   links.forEach(link => {
     if (link.hostname === window.location.hostname && link.href) {
       link.addEventListener("click", function (e) {
-        if (this.href !== window.location.href) {
+        if (this.href !== window.location.href && this.getAttribute("href") !== "#") {
           e.preventDefault();
           const target = this.href;
 
@@ -50,9 +50,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
           setTimeout(() => {
             window.location.href = target;
-          }, 400);
+          }, 300);
         }
       });
+    }
+  });
+
+  // Active icon logic
+  const utilityIcons = document.querySelectorAll('.utility-bar .utility-icon');
+  const currentPage = window.location.pathname.split("/").pop();
+
+  utilityIcons.forEach(icon => {
+    const linkPage = icon.getAttribute("href").split("/").pop();
+    if (linkPage === currentPage || (currentPage === "" && linkPage === "index.html")) {
+      icon.classList.add("active");
     }
   });
 });
