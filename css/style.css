@@ -39,9 +39,9 @@ body.fade-out {
   height: 160px;
 }
 
-/* ---- Hero (homepage only) ---- */
+/* ---- Hero (homepage) ---- */
 .hero {
-  min-height: 70vh;
+  min-height: calc(100vh - 220px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -79,9 +79,9 @@ body.fade-out {
   font-weight: bold;
 }
 
-/* ---- Subpage Background ---- */
+/* ---- Subpage Background (FIXED HEIGHT) ---- */
 .subpage-bg {
-  min-height: 70vh;
+  min-height: calc(100vh - 220px);
   background: linear-gradient(135deg, #e65c00, #000);
 }
 
@@ -115,7 +115,6 @@ body.fade-out {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.2s ease;
 }
 
 .utility-icon img {
@@ -123,7 +122,7 @@ body.fade-out {
   transition: 0.2s;
 }
 
-/* Glow ONLY on hover or active */
+/* Glow only when needed */
 .utility-icon:hover img,
 .utility-icon.active img {
   transform: scale(1.15);
