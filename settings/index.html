@@ -175,38 +175,15 @@ async function loadNav() {
       icon.classList.add("active");
     }
   });
-
-  setupTransitions();
-}
-
-function setupTransitions() {
-  document.querySelectorAll("a").forEach(link => {
-    if (link.hostname === window.location.hostname) {
-
-      const target = link.href;
-      const current = window.location.href;
-
-      link.addEventListener("click", function (e) {
-        if (target === current || this.getAttribute("href") === "#") return;
-
-        e.preventDefault();
-        document.body.classList.remove("fade-in");
-        document.body.classList.add("fade-out");
-
-        setTimeout(() => {
-          window.location.href = target;
-        }, 500);
-      });
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.body.classList.remove("fade-out");
-  document.body.classList.add("fade-in");
-
   loadNav();
-  setupTransitions();
+
+  // 🔥 trigger modern animation
+  requestAnimationFrame(() => {
+    document.body.classList.add("loaded");
+  });
 });
 </script>
 
