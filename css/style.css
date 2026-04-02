@@ -12,7 +12,7 @@ body {
   line-height:1.6;
   padding-bottom:120px;
 
-  /* FIXED TRANSITION (no transform = navbar works) */
+  /* Smooth fade for overall page load */
   opacity:0;
   transition: opacity 0.5s ease;
 }
@@ -23,6 +23,30 @@ body.fade-in {
 
 body.fade-out {
   opacity:0;
+}
+
+/* ---- UI ELEMENT TRANSITIONS ---- */
+header, main, footer {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  filter: blur(2px);
+  transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+}
+
+body.fade-in header,
+body.fade-in main,
+body.fade-in footer {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+body.fade-out header,
+body.fade-out main,
+body.fade-out footer {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+  filter: blur(2px);
 }
 
 /* ---- Header ---- */
@@ -112,6 +136,7 @@ body.fade-out {
   box-shadow: 0 0 20px rgba(230,92,0,0.4), 0 0 40px rgba(230,92,0,0.2);
   transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
 }
+
 /* ---- Icons ---- */
 .utility-icon {
   display:flex;
