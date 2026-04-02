@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
 <title>Settings - The Carey Network</title>
-
 <link rel="stylesheet" href="../css/style.css" />
 
-<!-- ONLY WHAT YOU ASKED FOR -->
+<!-- Web-App Icons / Manifest -->
 <link rel="apple-touch-icon" href="/images/icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,13 +26,12 @@
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 1fr 1fr; /* force 2x2 */
+  grid-template-columns: 1fr 1fr;
   gap: 25px;
 
   box-shadow: 0 0 20px rgba(230,92,0,0.3);
 }
 
-/* ---- Bigger Cards ---- */
 .setting-card {
   background: rgba(17,17,17,0.75);
   border-radius: 18px;
@@ -42,7 +39,6 @@
   text-align: center;
   color: #fff;
   cursor: pointer;
-
   min-height: 150px;
 
   display: flex;
@@ -64,14 +60,12 @@
   margin-bottom: 10px;
 }
 
-/* ---- Hover ---- */
 .setting-card:hover {
   transform: translateY(-4px);
   background: rgba(230,92,0,0.15);
   box-shadow: 0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5);
 }
 
-/* ---- Toggle Styles ---- */
 .toggle-switch {
   position: relative;
   width: 50px;
@@ -115,7 +109,6 @@ input:checked + .slider:before {
   transform: translateX(24px);
 }
 
-/* ---- Mobile Fix ---- */
 @media (max-width: 600px) {
   .settings-menu {
     grid-template-columns: 1fr;
@@ -125,17 +118,14 @@ input:checked + .slider:before {
 </head>
 
 <body>
-
 <header class="site-header">
   <img src="../images/logo.png" class="logo" alt="The Carey Network Logo" />
 </header>
 
 <main>
   <section class="hero orange-bg">
-
     <div class="settings-menu">
 
-      <!-- Cloak Button -->
       <div class="setting-card">
         <h3>Cloak</h3>
         <button style="
@@ -152,7 +142,6 @@ input:checked + .slider:before {
         </button>
       </div>
 
-      <!-- Auto Cloak Toggle -->
       <div class="setting-card">
         <h3>Auto Cloak</h3>
         <label class="toggle-switch">
@@ -161,7 +150,6 @@ input:checked + .slider:before {
         </label>
       </div>
 
-      <!-- Panic Button Toggle -->
       <div class="setting-card">
         <h3>Panic Button</h3>
         <label class="toggle-switch">
@@ -170,22 +158,18 @@ input:checked + .slider:before {
         </label>
       </div>
 
-      <!-- Web-App Mode Toggle -->
       <div class="setting-card">
         <h3>Web-App Mode</h3>
         <label class="toggle-switch">
-          <!-- Added data-webapp-toggle so main.js can auto-toggle it -->
-          <input type="checkbox" data-webapp-toggle>
+          <input id="webapp-toggle" type="checkbox">
           <span class="slider"></span>
         </label>
       </div>
 
     </div>
-
   </section>
 </main>
 
-<!-- Utility Bar -->
 <div id="nav-container"></div>
 
 <footer class="site-footer">
@@ -193,6 +177,6 @@ input:checked + .slider:before {
 </footer>
 
 <script src="/js/main.js"></script>
-
+  
 </body>
 </html>
