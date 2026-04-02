@@ -40,13 +40,13 @@ async function loadNav() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("load", () => {
   loadNav();
 
-  // 🔥 trigger modern animation
-  requestAnimationFrame(() => {
+  // GUARANTEED to run after everything loads
+  setTimeout(() => {
     document.body.classList.add("loaded");
-  });
+  }, 50);
 });
 </script>
 
