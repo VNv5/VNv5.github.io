@@ -97,7 +97,7 @@ body.fade-out {
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(17,17,17,0.95);
+  background: rgba(17,17,17,0.8); /* slightly more transparent */
   border-radius: 50px;
   padding: 10px 20px;
   display: flex;
@@ -108,7 +108,8 @@ body.fade-out {
   z-index: 9999;
   backdrop-filter: blur(10px);
 
-  box-shadow: 0 0 15px rgba(230,92,0,0.3), 0 0 30px rgba(230,92,0,0.15);
+  /* subtle orange glow */
+  box-shadow: 0 0 20px rgba(230,92,0,0.4), 0 0 40px rgba(230,92,0,0.2);
   transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
 }
 /* ---- Icons ---- */
