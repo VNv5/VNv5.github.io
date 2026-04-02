@@ -6,23 +6,14 @@
   font-family:"Inter",sans-serif;
 }
 
+/* ---- Body and Page Transitions ---- */
 body {
   background:#000;
   color:#fff;
   line-height:1.6;
   padding-bottom:120px;
 
-  /* NEW: start hidden for animation */
-  opacity:0;
-}
-
-/* ---- Page Transitions (WORKING VERSION) ---- */
-body {
-  background:#000;
-  color:#fff;
-  line-height:1.6;
-  padding-bottom:120px;
-
+  /* start hidden for animation */
   opacity:0;
   transition: opacity 0.5s ease;
 }
@@ -142,7 +133,6 @@ body.fade-out footer {
   z-index: 9999;
   backdrop-filter: blur(10px);
 
-  /* subtle orange glow */
   box-shadow:
     0 0 20px rgba(230,92,0,0.4),
     0 0 40px rgba(230,92,0,0.2);
