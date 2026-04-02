@@ -22,17 +22,34 @@ function setupTransitions() {
     if (link.hostname === window.location.hostname) {
       link.addEventListener("click", function(e) {
         if (this.closest('.utility-bar')) return;
+
         const target = this.href;
         if (target === window.location.href || this.getAttribute("href") === "#") return;
 
         e.preventDefault();
-        document.body.classList.remove("fade-in");
-        document.body.classList.add("fade-out");
 
-        setTimeout(() => window.location.href = target, 500);
+        fadeThen(() => {
+          window.location.href = target;
+        });
       });
     }
   });
+}
+
+// 🔥 NEW: reliable transition handler (replaces timeout issues)
+function fadeThen(callback) {
+  document.body.classList.remove("fade-in");
+  document.body.classList.add("fade-out");
+
+  // force repaint so animation actually plays
+  void document.body.offsetWidth;
+
+  const handler = () => {
+    document.body.removeEventListener("transitionend", handler);
+    callback();
+  };
+
+  document.body.addEventListener("transitionend", handler);
 }
 
 // 🔹 Detect web app
@@ -48,21 +65,18 @@ function showPopup(msg) {
   popup.classList.add('show');
 }
 
-// 🔹 Cloak function (new mobile-friendly method)
+// 🔹 Cloak function (your version, unchanged logic)
 function openCloak() {
   const newTab = window.open('about:blank', '_blank');
   if (!newTab) return showPopup('Popup blocked! Allow popups to use Cloak.');
 
-  // Wait a tiny bit to allow the tab to initialize
   setTimeout(() => {
-    // Grab current page HTML
     const html = document.documentElement.outerHTML;
-    // Write it into the blank tab
+
     newTab.document.open();
     newTab.document.write(html);
     newTab.document.close();
 
-    // Redirect original tab
     window.location.href = 'https://www.google.com';
   }, 50);
 }
@@ -70,8 +84,8 @@ function openCloak() {
 // 🔹 DOM Ready
 window.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("fade-in");
-  loadNav();
-  setupTransitions();
+
+  loadNav(); // ⬅️ this already calls setupTransitions()
 
   const isWebApp = detectWebAppMode();
   const cloakButton = document.querySelector('.setting-card:first-child button');
@@ -99,25 +113,24 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Cloak button
+  // 🔥 Cloak button (FIXED TRANSITION)
   cloakButton.addEventListener('click', () => {
     if (!webAppToggle.checked) {
-      document.body.classList.remove("fade-in");
-      document.body.classList.add("fade-out");
-      setTimeout(openCloak, 500); // allow fade-out first
-    } else showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
+      fadeThen(openCloak); // ✅ replaces broken timeout
+    } else {
+      showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
+    }
   });
 
-  // Auto Cloak
+  // 🔹 Auto Cloak
   if (autoCloakToggle) {
     autoCloakToggle.checked = localStorage.getItem('autoCloak') === 'true';
 
     autoCloakToggle.addEventListener('change', () => {
       localStorage.setItem('autoCloak', autoCloakToggle.checked);
+
       if (autoCloakToggle.checked && !webAppToggle.checked) {
-        document.body.classList.remove("fade-in");
-        document.body.classList.add("fade-out");
-        setTimeout(openCloak, 500);
+        fadeThen(openCloak); // ✅ fixed here too
       } else if (webAppToggle.checked) {
         autoCloakToggle.checked = false;
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
@@ -125,13 +138,11 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     if (autoCloakToggle.checked && !webAppToggle.checked) {
-      document.body.classList.remove("fade-in");
-      document.body.classList.add("fade-out");
-      setTimeout(openCloak, 500);
+      fadeThen(openCloak); // ✅ and here
     }
   }
 
-  // Panic toggle
+  // 🔹 Panic toggle
   if (panicButtonToggle) {
     panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
     panicButtonToggle.addEventListener('change', () => {
@@ -139,14 +150,16 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Cloak button styling (soft orange glow)
+  // 🔹 Cloak button styling (unchanged)
   if (cloakButton) {
     cloakButton.style.background = "#e65c00";
     cloakButton.style.boxShadow = "0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5)";
+
     cloakButton.addEventListener("mouseover", () => {
       cloakButton.style.transform = "scale(1.05)";
       cloakButton.style.boxShadow = "0 0 20px #e65c00, 0 0 40px rgba(230,92,0,0.6)";
     });
+
     cloakButton.addEventListener("mouseout", () => {
       cloakButton.style.transform = "scale(1)";
       cloakButton.style.boxShadow = "0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5)";
