@@ -1,101 +1,115 @@
-// main.js - SPA + Utility Bar + Web App Mode
+// main.js
 
-// Detect if running as standalone web app
-function isWebAppMode() {
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+// --- Global Variables ---
+let isWebApp = false;
+
+// --- Detect if running as a web app ---
+function detectWebAppMode() {
+  isWebApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const webAppToggle = document.querySelector("#webapp-toggle input");
+  if (webAppToggle) webAppToggle.checked = isWebApp;
 }
 
-// Load the navigation bar
+// --- Initialize Utility Bar ---
 async function loadNav() {
-  const res = await fetch("/components/nav.html");
-  const data = await res.text();
-  document.getElementById("nav-container").innerHTML = data;
+  const navContainer = document.getElementById("nav-container");
+  if (!navContainer) return;
 
-  // Highlight the active icon
-  const icons = document.querySelectorAll(".utility-icon");
-  const currentPath = window.location.pathname;
+  try {
+    const res = await fetch("/components/nav.html");
+    if (!res.ok) throw new Error("Nav not found");
+    const data = await res.text();
+    navContainer.innerHTML = data;
 
-  icons.forEach(icon => {
-    const iconPath = new URL(icon.href, location.origin).pathname;
-    if (iconPath === currentPath) {
-      icon.classList.add("active");
-    }
-  });
+    // Highlight active icon
+    const icons = document.querySelectorAll(".utility-icon");
+    const currentPath = window.location.pathname;
+    icons.forEach(icon => {
+      const iconPath = new URL(icon.href).pathname;
+      if (iconPath === currentPath) icon.classList.add("active");
+    });
+
+  } catch (err) {
+    console.warn("Could not load nav:", err);
+  }
 }
 
-// Load page content dynamically
+// --- SPA Page Loader with Fallback ---
 async function loadPage(path) {
   const mainSection = document.querySelector("main");
-  
+  if (!mainSection) return;
+
   // Fade out current content
+  mainSection.style.transition = "opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease";
   mainSection.style.opacity = "0";
   mainSection.style.transform = "translateY(8px) scale(0.985)";
   mainSection.style.filter = "blur(1.5px)";
-  
+
   try {
     const res = await fetch(path);
     if (!res.ok) throw new Error("Page not found");
     const html = await res.text();
-    
-    // Parse fetched HTML and extract <main> content
+
+    // Extract <main> content
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const newMain = doc.querySelector("main");
-    
-    // Replace content
+    if (!newMain) throw new Error("<main> not found in page");
+
     setTimeout(() => {
       mainSection.innerHTML = newMain.innerHTML;
-
-      // Fade in new content
       mainSection.style.opacity = "1";
       mainSection.style.transform = "translateY(0) scale(1)";
       mainSection.style.filter = "blur(0)";
-      
-      // Re-run any scripts for new content
       setupUI();
     }, 200);
+
+    // Update browser history if not in standalone mode
+    if (!isWebApp) window.history.pushState({}, "", path);
+
   } catch (err) {
-    console.error("Failed to load page:", err);
+    // Fallback: keep current content for standalone apps / local files
+    console.warn("Could not fetch page, using current content:", err);
+    mainSection.style.opacity = "1";
+    mainSection.style.transform = "translateY(0) scale(1)";
+    mainSection.style.filter = "blur(0)";
   }
 }
 
-// Setup link clicks and utility bar behavior
-function setupUI() {
-  // Links inside main should load dynamically
+// --- Setup SPA Links ---
+function setupTransitions() {
   document.querySelectorAll("a").forEach(link => {
     if (link.hostname === window.location.hostname) {
-      link.addEventListener("click", e => {
-        const target = link.getAttribute("href");
-        if (!target || target === "#") return;
+      link.addEventListener("click", function(e) {
+        const target = this.href;
+        const current = window.location.href;
+        if (target === current || this.getAttribute("href") === "#") return;
+
         e.preventDefault();
         loadPage(target);
-        // Update browser history
-        window.history.pushState({}, "", target);
       });
     }
   });
-
-  // Utility icon active handling
-  const icons = document.querySelectorAll(".utility-icon");
-  icons.forEach(icon => {
-    icon.addEventListener("click", () => {
-      icons.forEach(i => i.classList.remove("active"));
-      icon.classList.add("active");
-    });
-  });
-
-  // Auto-toggle Web App mode if running as standalone
-  const webAppCheckbox = document.querySelector('input[type="checkbox"][id="webapp-toggle"]');
-  if (webAppCheckbox) webAppCheckbox.checked = isWebAppMode();
 }
 
-// Handle browser back/forward buttons
+// --- Setup UI Components after load ---
+function setupUI() {
+  // Reattach any toggle events, buttons, etc.
+  detectWebAppMode(); // Auto-toggle web app mode
+}
+
+// --- Handle Browser Back/Forward ---
 window.addEventListener("popstate", () => {
   loadPage(window.location.pathname);
 });
 
-// Initial page load
+// --- DOM Ready ---
 document.addEventListener("DOMContentLoaded", () => {
+  detectWebAppMode();
   loadNav();
-  setupUI();
+  setupTransitions();
+
+  // Initial fade-in
+  document.body.style.transition = "opacity 0.4s ease";
+  document.body.style.opacity = "1";
 });
