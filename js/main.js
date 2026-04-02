@@ -21,7 +21,7 @@ function setupTransitions() {
   document.querySelectorAll("a").forEach(link => {
     if (link.hostname === window.location.hostname) {
       link.addEventListener("click", function(e) {
-        if (this.closest('.utility-bar')) return; // don't transition utility bar links
+        if (this.closest('.utility-bar')) return;
         const target = this.href;
         const current = window.location.href;
         if (target === current || this.getAttribute("href") === "#") return;
@@ -32,13 +32,13 @@ function setupTransitions() {
 
         setTimeout(() => {
           window.location.href = target;
-        }, 500); // matches CSS transition
+        }, 500);
       });
     }
   });
 }
 
-// 🔹 Detect if running as mobile web app
+// 🔹 Detect Web-App Mode
 function detectWebAppMode() {
   return window.matchMedia('(display-mode: standalone)').matches
        || window.navigator.standalone === true;
@@ -52,7 +52,7 @@ function showPopup(msg) {
   popup.classList.add('show');
 }
 
-// 🔹 Cloak functionality
+// 🔹 Cloak function (opens site in about:blank and redirects old tab)
 function openCloak() {
   document.body.classList.remove("fade-in");
   document.body.classList.add("fade-out");
@@ -60,13 +60,15 @@ function openCloak() {
   setTimeout(() => {
     const newTab = window.open('about:blank', '_blank');
     if (newTab) {
+      // Write current site HTML into new blank tab
       newTab.document.write('<!DOCTYPE html>' + document.documentElement.outerHTML);
       newTab.document.close();
+      // Redirect original tab
       window.location.href = 'https://www.google.com';
     } else {
       showPopup('Popup blocked! Please allow popups to use Cloak.');
     }
-  }, 300); // give fade-out time to play
+  }, 300);
 }
 
 // 🔹 DOM Ready
@@ -86,18 +88,18 @@ window.addEventListener("DOMContentLoaded", () => {
   const popupClose = document.getElementById('popup-close');
   popupClose.addEventListener('click', () => document.getElementById('settings-popup').classList.remove('show'));
 
-  // 🔹 Web-App Mode
+  // 🔹 Web-App Mode logic
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
     webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode cannot be turned off while in standalone mode.');
+      showPopup('Web-App Mode cannot be turned off in standalone mode.');
     });
   } else {
     webAppToggle.checked = false;
     webAppToggle.disabled = true;
     webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode can only be enabled in mobile web app mode.');
+      showPopup('Web-App Mode can only be enabled in mobile web app.');
     });
   }
 
@@ -124,17 +126,31 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 🔹 Trigger on page load if enabled
+    // 🔹 Trigger auto-cloak on page load if enabled
     if (autoCloakToggle.checked && !webAppToggle.checked) {
       openCloak();
     }
   }
 
-  // 🔹 Panic button (save state, functionality later)
+  // 🔹 Panic button (state only)
   if (panicButtonToggle) {
     panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
     panicButtonToggle.addEventListener('change', () => {
       localStorage.setItem('panicButton', panicButtonToggle.checked);
+    });
+  }
+
+  // 🔹 Restore glow color for Cloak button
+  if (cloakButton) {
+    cloakButton.style.background = "#e65c00"; // soft orange
+    cloakButton.style.boxShadow = "0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5)";
+    cloakButton.addEventListener("mouseover", () => {
+      cloakButton.style.transform = "scale(1.05)";
+      cloakButton.style.boxShadow = "0 0 20px #e65c00, 0 0 40px rgba(230,92,0,0.6)";
+    });
+    cloakButton.addEventListener("mouseout", () => {
+      cloakButton.style.transform = "scale(1)";
+      cloakButton.style.boxShadow = "0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5)";
     });
   }
 });
