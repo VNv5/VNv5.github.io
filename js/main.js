@@ -33,8 +33,9 @@ function setupTransitions() {
         document.body.classList.add("fade-out");
 
         setTimeout(() => {
-          window.location.href = target; // normal reload, safe for PWA
-        }, 500);
+          document.body.offsetHeight;
+          window.location.href = target;
+        }, 300);
       });
     }
   });
