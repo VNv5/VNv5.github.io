@@ -17,6 +17,10 @@ body {
 }
 
 /* ---- Modern Page Load Animation ---- */
+header, main, footer {
+  opacity: 0;
+}
+
 body.loaded header,
 body.loaded main,
 body.loaded footer {
@@ -28,11 +32,6 @@ body.loaded footer {
     opacity: 0;
     transform: translateY(20px) scale(0.97);
     filter: blur(6px);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(-2px) scale(1.01);
-    filter: blur(1px);
   }
   100% {
     opacity: 1;
