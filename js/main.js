@@ -6,16 +6,13 @@ async function loadNav() {
   const data = await res.text();
   document.getElementById("nav-container").innerHTML = data;
 
-  // Highlight the current icon
   const icons = document.querySelectorAll(".utility-icon");
   const currentPath = window.location.pathname;
-
   icons.forEach(icon => {
     const iconPath = new URL(icon.href).pathname;
     if (iconPath === currentPath) icon.classList.add("active");
   });
 
-  // Attach page transitions AFTER nav loads
   setupTransitions();
 }
 
@@ -24,7 +21,7 @@ function setupTransitions() {
   document.querySelectorAll("a").forEach(link => {
     if (link.hostname === window.location.hostname) {
       link.addEventListener("click", function(e) {
-        if (this.closest('.utility-bar')) return;
+        if (this.closest('.utility-bar')) return; // don't transition utility bar links
         const target = this.href;
         const current = window.location.href;
         if (target === current || this.getAttribute("href") === "#") return;
@@ -35,19 +32,19 @@ function setupTransitions() {
 
         setTimeout(() => {
           window.location.href = target;
-        }, 500);
+        }, 500); // matches CSS transition
       });
     }
   });
 }
 
-// 🔹 Detect if site is running as a mobile web app
+// 🔹 Detect if running as mobile web app
 function detectWebAppMode() {
   return window.matchMedia('(display-mode: standalone)').matches
        || window.navigator.standalone === true;
 }
 
-// 🔹 Popup Utility
+// 🔹 Show popup
 function showPopup(msg) {
   const popup = document.getElementById('settings-popup');
   const popupMessage = document.getElementById('popup-message');
@@ -55,19 +52,21 @@ function showPopup(msg) {
   popup.classList.add('show');
 }
 
-// 🔹 Cloak Function using about:blank
+// 🔹 Cloak functionality
 function openCloak() {
-  const newTab = window.open('about:blank', '_blank');
-  if (newTab) {
-    // Clone current page's HTML into the new tab
-    newTab.document.write('<!DOCTYPE html>' + document.documentElement.outerHTML);
-    newTab.document.close();
+  document.body.classList.remove("fade-in");
+  document.body.classList.add("fade-out");
 
-    // Redirect original tab
-    window.location.href = 'https://www.google.com';
-  } else {
-    showPopup('Popup blocked! Please allow popups to use Cloak.');
-  }
+  setTimeout(() => {
+    const newTab = window.open('about:blank', '_blank');
+    if (newTab) {
+      newTab.document.write('<!DOCTYPE html>' + document.documentElement.outerHTML);
+      newTab.document.close();
+      window.location.href = 'https://www.google.com';
+    } else {
+      showPopup('Popup blocked! Please allow popups to use Cloak.');
+    }
+  }, 300); // give fade-out time to play
 }
 
 // 🔹 DOM Ready
@@ -87,7 +86,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const popupClose = document.getElementById('popup-close');
   popupClose.addEventListener('click', () => document.getElementById('settings-popup').classList.remove('show'));
 
-  // Web-App Mode settings
+  // 🔹 Web-App Mode
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
@@ -102,7 +101,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Cloak Button
+  // 🔹 Cloak button
   cloakButton?.addEventListener('click', () => {
     if (!webAppToggle.checked) {
       openCloak();
@@ -111,27 +110,27 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Auto Cloak
+  // 🔹 Auto Cloak
   if (autoCloakToggle) {
     autoCloakToggle.checked = localStorage.getItem('autoCloak') === 'true';
 
     autoCloakToggle.addEventListener('change', () => {
       localStorage.setItem('autoCloak', autoCloakToggle.checked);
       if (autoCloakToggle.checked && !webAppToggle.checked) {
-        setTimeout(() => openCloak(), 300);
+        openCloak();
       } else if (webAppToggle.checked) {
         autoCloakToggle.checked = false;
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
       }
     });
 
-    // Trigger Auto Cloak on page load if enabled
+    // 🔹 Trigger on page load if enabled
     if (autoCloakToggle.checked && !webAppToggle.checked) {
-      setTimeout(() => openCloak(), 300);
+      openCloak();
     }
   }
 
-  // Panic Button (placeholder)
+  // 🔹 Panic button (save state, functionality later)
   if (panicButtonToggle) {
     panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
     panicButtonToggle.addEventListener('change', () => {
