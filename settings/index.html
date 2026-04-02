@@ -6,34 +6,45 @@
 <title>Settings - The Carey Network</title>
 <link rel="stylesheet" href="../css/style.css" />
 <style>
-/* ---- Modern Settings Menu ---- */
+/* ---- Modern Settings Menu (2x2 GRID) ---- */
 .settings-menu {
   background: rgba(0,0,0,0.5);
   backdrop-filter: blur(12px);
   border-radius: 20px;
-  padding: 30px;
-  max-width: 800px;
+  padding: 40px;
+  max-width: 700px;
   width: 90%;
   margin: 0 auto;
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr 1fr; /* FORCE 2x2 */
+  gap: 25px;
+
   box-shadow: 0 0 20px rgba(230,92,0,0.3);
 }
 
+/* ---- Bigger Cards ---- */
 .setting-card {
-  background: rgba(17,17,17,0.7);
-  border-radius: 15px;
-  padding: 20px;
+  background: rgba(17,17,17,0.75);
+  border-radius: 18px;
+  padding: 30px;
   text-align: center;
   color: #fff;
   cursor: pointer;
+
+  min-height: 150px; /* BIGGER */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .setting-card h3 {
   margin-bottom: 15px;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .setting-card p {
@@ -42,11 +53,11 @@
   margin-bottom: 10px;
 }
 
-/* ---- Hover Effects ---- */
+/* ---- Hover ---- */
 .setting-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   background: rgba(230,92,0,0.15);
-  box-shadow: 0 0 10px #e65c00, 0 0 20px rgba(230,92,0,0.5);
+  box-shadow: 0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5);
 }
 
 /* ---- Toggle Styles ---- */
@@ -91,6 +102,13 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(24px);
+}
+
+/* ---- Mobile Fix ---- */
+@media (max-width: 600px) {
+  .settings-menu {
+    grid-template-columns: 1fr; /* stack on small screens */
+  }
 }
 </style>
 </head>
