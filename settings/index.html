@@ -28,7 +28,7 @@
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr; /* force 2x2 */
   gap: 25px;
 
   box-shadow: 0 0 20px rgba(230,92,0,0.3);
@@ -135,6 +135,7 @@ input:checked + .slider:before {
 
     <div class="settings-menu">
 
+      <!-- Cloak Button -->
       <div class="setting-card">
         <h3>Cloak</h3>
         <button style="
@@ -151,6 +152,7 @@ input:checked + .slider:before {
         </button>
       </div>
 
+      <!-- Auto Cloak Toggle -->
       <div class="setting-card">
         <h3>Auto Cloak</h3>
         <label class="toggle-switch">
@@ -159,6 +161,7 @@ input:checked + .slider:before {
         </label>
       </div>
 
+      <!-- Panic Button Toggle -->
       <div class="setting-card">
         <h3>Panic Button</h3>
         <label class="toggle-switch">
@@ -167,10 +170,12 @@ input:checked + .slider:before {
         </label>
       </div>
 
+      <!-- Web-App Mode Toggle -->
       <div class="setting-card">
         <h3>Web-App Mode</h3>
         <label class="toggle-switch">
-          <input type="checkbox">
+          <!-- Added data-webapp-toggle so main.js can auto-toggle it -->
+          <input type="checkbox" data-webapp-toggle>
           <span class="slider"></span>
         </label>
       </div>
