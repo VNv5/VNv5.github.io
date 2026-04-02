@@ -38,14 +38,12 @@ function detectWebAppMode() {
        || window.navigator.standalone === true;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.classList.remove("fade-out");
+window.onload = () => {
   document.body.classList.add("fade-in");
-
   loadNav();
   setupTransitions();
-  const isWebApp = detectWebAppMode();
 
+  const isWebApp = detectWebAppMode();
   const cloakButton = document.querySelector('.setting-card:first-child button');
   const autoCloakToggle = document.querySelector('.setting-card:nth-child(2) input[type="checkbox"]');
   const panicButtonToggle = document.querySelector('.setting-card:nth-child(3) input[type="checkbox"]');
@@ -54,13 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const popup = document.getElementById('settings-popup');
   const popupMessage = document.getElementById('popup-message');
   const popupClose = document.getElementById('popup-close');
+
   function showPopup(msg) {
     popupMessage.textContent = msg;
     popup.classList.add('show');
   }
   popupClose.addEventListener('click', () => popup.classList.remove('show'));
 
-  // Only enable Web-App Mode toggle if actually in PWA
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
@@ -109,4 +107,4 @@ document.addEventListener("DOMContentLoaded", () => {
       showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
     }
   });
-});
+};
