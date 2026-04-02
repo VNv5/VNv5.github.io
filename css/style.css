@@ -12,41 +12,33 @@ body {
   line-height:1.6;
   padding-bottom:120px;
 
-  /* Smooth fade for overall page load */
-  opacity:0;
-  transition: opacity 0.5s ease;
-}
-
-body.fade-in {
-  opacity:1;
-}
-
-body.fade-out {
+  /* NEW: start hidden for animation */
   opacity:0;
 }
 
-/* ---- Page Transitions for UI Elements ---- */
-header, main, footer {
-  opacity: 0;
-  transform: translateY(8px) scale(0.985);
-  filter: blur(1.5px);
-  transition: opacity 0.35s ease-out, transform 0.35s ease-out, filter 0.35s ease-out;
+/* ---- Modern Page Load Animation ---- */
+body.loaded header,
+body.loaded main,
+body.loaded footer {
+  animation: pageEnter 0.6s ease forwards;
 }
 
-body.fade-in header,
-body.fade-in main,
-body.fade-in footer {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-
-body.fade-out header,
-body.fade-out main,
-body.fade-out footer {
-  opacity: 0;
-  transform: translateY(-8px) scale(0.985);
-  filter: blur(1.5px);
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    filter: blur(6px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.01);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
 }
 
 /* ---- Header ---- */
@@ -115,13 +107,13 @@ body.fade-out footer {
   color:#777;
 }
 
-/* ---- Utility Bar (NOW WORKS CORRECTLY) ---- */
+/* ---- Utility Bar (STAYS LOCKED + GLOWING) ---- */
 .utility-bar {
   position: fixed;
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(17,17,17,0.8); /* slightly more transparent */
+  background: rgba(17,17,17,0.8);
   border-radius: 50px;
   padding: 10px 20px;
   display: flex;
@@ -133,7 +125,10 @@ body.fade-out footer {
   backdrop-filter: blur(10px);
 
   /* subtle orange glow */
-  box-shadow: 0 0 20px rgba(230,92,0,0.4), 0 0 40px rgba(230,92,0,0.2);
+  box-shadow:
+    0 0 20px rgba(230,92,0,0.4),
+    0 0 40px rgba(230,92,0,0.2);
+
   transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -167,7 +162,7 @@ body.fade-out footer {
   transform:scale(1.1);
 }
 
-/* ---- HOVER (works WITH active) ---- */
+/* ---- HOVER (only hovered icon glows) ---- */
 .utility-icon:hover {
   background:rgba(230,92,0,0.1);
   box-shadow:
