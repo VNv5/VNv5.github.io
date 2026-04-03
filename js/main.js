@@ -52,10 +52,10 @@ function showPopup(msg) {
   popup.classList.add('show');
 }
 
-// 🔥 FIXED CLOAK (REAL MOBILE METHOD)
+// 🔥 REAL MOBILE ABOUT:BLANK CLOAK
 function openCloak() {
 
-  // FIRST CLICK → open blank tab instantly (NO delays)
+  // FIRST CLICK → open blank tab instantly
   if (!cloakPrimed) {
     cloakWindow = window.open('about:blank', '_blank');
 
@@ -65,18 +65,43 @@ function openCloak() {
     }
 
     cloakPrimed = true;
-    return; // nothing visible
+    return;
   }
 
-  // SECOND CLICK → load actual page
-  const url = window.location.origin + "/settings/index.html";
-
+  // SECOND CLICK → WRITE into that tab (THIS is the fix)
   if (cloakWindow && !cloakWindow.closed) {
-    cloakWindow.location.replace(url);
-  }
+    const url = window.location.origin + "/settings/index.html";
 
-  // redirect current tab
-  window.location.replace("https://www.ixl.com");
+    cloakWindow.document.open();
+    cloakWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Settings</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            html, body {
+              margin: 0;
+              height: 100%;
+              background: #0f0f0f;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+          </style>
+        </head>
+        <body>
+          <iframe src="${url}"></iframe>
+        </body>
+      </html>
+    `);
+    cloakWindow.document.close();
+
+    // redirect current tab AFTER writing
+    window.location.replace("https://www.ixl.com");
+  }
 }
 
 // 🔹 DOM Ready
@@ -90,31 +115,23 @@ window.addEventListener("DOMContentLoaded", () => {
   const panicButtonToggle = document.querySelector('.setting-card:nth-child(3) input[type="checkbox"]');
   const webAppToggle = document.querySelector('.setting-card:nth-child(4) input[type="checkbox"]');
 
-  // Popup close
   document.getElementById('popup-close').addEventListener('click', () => {
     document.getElementById('settings-popup').classList.remove('show');
   });
 
-  // Web-app logic
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
-    webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode cannot be turned off in standalone mode.');
-    });
   } else {
     webAppToggle.checked = false;
     webAppToggle.disabled = true;
-    webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode can only be enabled in mobile web app.');
-    });
   }
 
-  // 🔥 Cloak button (NO transitions, NO delays)
+  // 🔥 CLOAK BUTTON (NO DELAYS, NO TRANSITIONS)
   if (cloakButton) {
     cloakButton.addEventListener('click', () => {
       if (!webAppToggle.checked) {
-        openCloak(); // direct call ONLY
+        openCloak();
       } else {
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
       }
@@ -130,9 +147,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
       if (autoCloakToggle.checked && !webAppToggle.checked) {
         openCloak();
-      } else if (webAppToggle.checked) {
-        autoCloakToggle.checked = false;
-        showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
       }
     });
 
