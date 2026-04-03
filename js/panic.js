@@ -6,6 +6,11 @@ const menu = document.createElement("div");
 menu.id = "panic-menu";
 
 menu.innerHTML = `
+<div id="panic-menu-header">
+  <span>Panic Settings</span>
+  <button id="panic-close">X</button>
+</div>
+
 <div>
   <div class="panic-section">Size</div>
   <div class="panic-options">
@@ -102,7 +107,7 @@ function startInteraction(e) {
 
   holdTimer = setTimeout(() => {
     if (!moved) openMenu();
-  }, 1500);
+  }, 800); // shorter hold for mobile
 
   e.preventDefault();
 }
@@ -146,6 +151,9 @@ function endInteraction() {
 }
 
 /* ===== MENU ===== */
+const closeBtn = document.getElementById("panic-close");
+closeBtn.onclick = () => menu.style.display = "none";
+
 function openMenu() {
   menu.style.display = "flex";
 
@@ -160,17 +168,11 @@ function openMenu() {
   menu.style.top = y + "px";
 }
 
-document.addEventListener("click", (e) => {
-  if (!menu.contains(e.target) && e.target !== btn) {
-    menu.style.display = "none";
-  }
-});
-
 /* ===== PANIC CLICK ===== */
 btn.addEventListener("click", () => {
-  if (moved) return;
+  if (moved) return; // don't trigger when dragging
   window.location.href = "about:blank";
 });
 
-/* INIT */
+/* ===== INIT ===== */
 applySettings();
