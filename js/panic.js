@@ -1,6 +1,4 @@
-const panicToggle = document.getElementById("panicToggle");
-
-/* ===== CREATE BUTTON ===== */
+/* ===== CREATE ELEMENTS ===== */
 const btn = document.createElement("div");
 btn.id = "panic-btn";
 
@@ -32,11 +30,15 @@ menu.innerHTML = `
 </div>
 `;
 
+/* ===== ADD TO PAGE ===== */
 document.body.appendChild(btn);
 document.body.appendChild(menu);
 
+/* ===== APPLY IMAGE ===== */
+btn.style.backgroundImage = "url('/images/panicbutton.png')";
+
 /* ===== LOAD SETTINGS ===== */
-function loadSettings() {
+function applySettings() {
   const enabled = localStorage.getItem("panicEnabled") === "true";
   const size = localStorage.getItem("panicSize") || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
@@ -49,7 +51,8 @@ function loadSettings() {
 
   btn.style.opacity = opacity / 100;
 
-  document.getElementById("panic-opacity").value = opacity;
+  const slider = document.getElementById("panic-opacity");
+  if (slider) slider.value = opacity;
 
   document.querySelectorAll("[data-size]").forEach(b => {
     b.classList.toggle("active", b.dataset.size === size);
@@ -60,26 +63,25 @@ function loadSettings() {
   });
 }
 
-/* ===== SETTINGS ===== */
+/* ===== WATCH FOR TOGGLE CHANGES (🔥 IMPORTANT) ===== */
+window.addEventListener("storage", applySettings);
+
+/* ALSO POLL IN CASE SAME TAB */
+setInterval(applySettings, 500);
+
+/* ===== SETTINGS INTERACTION ===== */
 document.addEventListener("click", (e) => {
 
   if (e.target.dataset.size) {
     const size = e.target.dataset.size;
     localStorage.setItem("panicSize", size);
-
-    btn.className = "";
-    btn.classList.add(`panic-${size}`);
-
-    document.querySelectorAll("[data-size]").forEach(b => b.classList.remove("active"));
-    e.target.classList.add("active");
+    applySettings();
   }
 
   if (e.target.dataset.mode) {
     const mode = e.target.dataset.mode;
     localStorage.setItem("panicMode", mode);
-
-    document.querySelectorAll("[data-mode]").forEach(m => m.classList.remove("active"));
-    e.target.classList.add("active");
+    applySettings();
   }
 });
 
@@ -97,7 +99,7 @@ let holdTimer;
 btn.addEventListener("mousedown", startHold);
 btn.addEventListener("touchstart", startHold);
 
-function startHold() {
+function startHold(e) {
   isDragging = false;
 
   holdTimer = setTimeout(() => {
@@ -154,12 +156,12 @@ document.addEventListener("click", (e) => {
 
 /* ===== PANIC ACTION ===== */
 btn.addEventListener("click", () => {
-  const mode = localStorage.getItem("panicMode");
+  const mode = localStorage.getItem("panicMode") || "blank";
 
   if (mode === "google") window.location.href = "https://google.com";
   if (mode === "blank") window.location.href = "about:blank";
   if (mode === "hide") document.body.style.display = "none";
 });
 
-/* INIT */
-loadSettings();
+/* ===== INIT ===== */
+applySettings();
