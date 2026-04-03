@@ -84,7 +84,7 @@ window.onload = () => {
     });
   });
 
-  // 🔹 Auto Cloak toggle (no actual cloak logic anymore)
+  // 🔹 Auto Cloak toggle (no actual cloak logic)
   if (autoCloakToggle) {
     autoCloakToggle.checked = localStorage.getItem('autoCloak') === 'true';
 
@@ -106,12 +106,33 @@ window.onload = () => {
     });
   }
 
-  // 🔥 Cloak button (NOW JUST POPUP)
-  cloakButton?.addEventListener('click', () => {
-    if (!webAppToggle.checked) {
-      showPopup('Cloak feature is currently disabled.');
-    } else {
-      showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
-    }
-  });
+  // 🔥 Cloak button (popup only)
+  if (cloakButton) {
+    cloakButton.addEventListener('click', () => {
+      if (!webAppToggle.checked) {
+        showPopup('Cloak feature is currently disabled.');
+      } else {
+        showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
+      }
+    });
+
+    // 🎨 THEMED BUTTON (NO ORANGE)
+    cloakButton.style.background = "#2a2a2a";
+    cloakButton.style.color = "#ffffff";
+    cloakButton.style.border = "1px solid #3a3a3a";
+    cloakButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
+    cloakButton.style.transition = "all 0.2s ease";
+
+    cloakButton.addEventListener("mouseover", () => {
+      cloakButton.style.background = "#333";
+      cloakButton.style.transform = "translateY(-1px)";
+      cloakButton.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
+    });
+
+    cloakButton.addEventListener("mouseout", () => {
+      cloakButton.style.background = "#2a2a2a";
+      cloakButton.style.transform = "none";
+      cloakButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
+    });
+  }
 };
