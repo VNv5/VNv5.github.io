@@ -19,14 +19,14 @@
 
   cursor: grab;
 
-  /* 🔥 FIX MOBILE SELECTION */
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
 
-  transition: transform 0.15s ease, opacity 0.2s ease;
+  /* ✅ THINNER GLOW */
+  box-shadow: 0 0 6px #e65c00, 0 0 12px rgba(230,92,0,0.5);
 
-  box-shadow: 0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.6);
+  transition: transform 0.15s ease, opacity 0.2s ease;
 }
 
 #panic-btn:active {
@@ -34,21 +34,10 @@
   cursor: grabbing;
 }
 
-/* ✅ REAL SIZE CHANGES */
-.panic-small {
-  width: 45px;
-  height: 45px;
-}
-
-.panic-medium {
-  width: 65px;
-  height: 65px;
-}
-
-.panic-large {
-  width: 90px;
-  height: 90px;
-}
+/* Sizes */
+.panic-small { width: 45px; height: 45px; }
+.panic-medium { width: 65px; height: 65px; }
+.panic-large { width: 90px; height: 90px; }
 
 /* ===== MENU ===== */
 #panic-menu {
@@ -66,7 +55,7 @@
 
   z-index: 10000;
 
-  box-shadow: 0 0 25px #e65c00, 0 0 50px rgba(230,92,0,0.6);
+  box-shadow: 0 0 20px #e65c00, 0 0 40px rgba(230,92,0,0.5);
 
   animation: panicPop 0.2s ease;
 }
@@ -82,7 +71,7 @@
   color: #aaa;
 }
 
-/* Buttons */
+/* Size buttons */
 .panic-options {
   display: flex;
   gap: 8px;
@@ -95,17 +84,17 @@
   border-radius: 10px;
   background: #222;
   color: #fff;
+  cursor: pointer;
 }
 
 .panic-options button.active {
   background: #e65c00;
-  box-shadow: 0 0 10px #e65c00;
+  box-shadow: 0 0 8px #e65c00;
 }
 
 /* Lock toggle */
 .panic-lock {
   display: flex;
-  align-items: center;
   justify-content: space-between;
   background: #1a1a1a;
   padding: 10px;
