@@ -1,4 +1,3 @@
-/* ===== CREATE ELEMENTS ===== */
 const btn = document.createElement("div");
 btn.id = "panic-btn";
 
@@ -20,71 +19,39 @@ menu.innerHTML = `
   <input type="range" id="panic-opacity" min="5" max="100">
 </div>
 
-<div>
-  <div class="panic-section">Mode</div>
-  <div class="panic-list">
-    <div class="panic-item" data-mode="blank">Blank Tab</div>
-    <div class="panic-item" data-mode="google">Google</div>
-    <div class="panic-item" data-mode="hide">Hide Page</div>
-  </div>
+<div class="panic-lock" id="panic-lock">
+  <span>Lock Position</span>
+  <span id="lock-state">OFF</span>
 </div>
 `;
 
-/* ===== ADD TO PAGE ===== */
 document.body.appendChild(btn);
 document.body.appendChild(menu);
-
-/* ===== APPLY IMAGE ===== */
-btn.style.backgroundImage = "url('/images/panicbutton.png')";
 
 /* ===== LOAD SETTINGS ===== */
 function applySettings() {
   const enabled = localStorage.getItem("panicEnabled") === "true";
   const size = localStorage.getItem("panicSize") || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
-  const mode = localStorage.getItem("panicMode") || "blank";
+  const locked = localStorage.getItem("panicLocked") === "true";
 
   btn.style.display = enabled ? "flex" : "none";
-
-  btn.className = "";
-  btn.classList.add(`panic-${size}`);
-
+  btn.className = `panic-${size}`;
   btn.style.opacity = opacity / 100;
 
-  const slider = document.getElementById("panic-opacity");
-  if (slider) slider.value = opacity;
-
-  document.querySelectorAll("[data-size]").forEach(b => {
-    b.classList.toggle("active", b.dataset.size === size);
-  });
-
-  document.querySelectorAll("[data-mode]").forEach(m => {
-    m.classList.toggle("active", m.dataset.mode === mode);
-  });
+  document.getElementById("panic-opacity").value = opacity;
+  document.getElementById("lock-state").textContent = locked ? "ON" : "OFF";
 }
 
-/* ===== WATCH FOR TOGGLE CHANGES (🔥 IMPORTANT) ===== */
-window.addEventListener("storage", applySettings);
-
-/* ALSO POLL IN CASE SAME TAB */
-setInterval(applySettings, 500);
-
-/* ===== SETTINGS INTERACTION ===== */
+/* ===== SIZE ===== */
 document.addEventListener("click", (e) => {
-
   if (e.target.dataset.size) {
-    const size = e.target.dataset.size;
-    localStorage.setItem("panicSize", size);
-    applySettings();
-  }
-
-  if (e.target.dataset.mode) {
-    const mode = e.target.dataset.mode;
-    localStorage.setItem("panicMode", mode);
+    localStorage.setItem("panicSize", e.target.dataset.size);
     applySettings();
   }
 });
 
+/* ===== OPACITY ===== */
 document.addEventListener("input", (e) => {
   if (e.target.id === "panic-opacity") {
     localStorage.setItem("panicOpacity", e.target.value);
@@ -92,51 +59,85 @@ document.addEventListener("input", (e) => {
   }
 });
 
-/* ===== DRAG + HOLD ===== */
-let isDragging = false;
-let holdTimer;
+/* ===== LOCK ===== */
+document.getElementById("panic-lock").onclick = () => {
+  const locked = localStorage.getItem("panicLocked") === "true";
+  localStorage.setItem("panicLocked", !locked);
+  applySettings();
+};
 
-btn.addEventListener("mousedown", startHold);
-btn.addEventListener("touchstart", startHold);
+/* ===== DRAG SYSTEM (FIXED) ===== */
+let dragging = false;
+let moved = false;
+let offsetX = 0;
+let offsetY = 0;
 
-function startHold(e) {
-  isDragging = false;
+btn.addEventListener("mousedown", startDrag);
+btn.addEventListener("touchstart", startDrag, { passive: false });
 
-  holdTimer = setTimeout(() => {
-    if (!isDragging) openMenu();
-  }, 1500);
+function startDrag(e) {
+  const locked = localStorage.getItem("panicLocked") === "true";
+  if (locked) return;
+
+  dragging = true;
+  moved = false;
+
+  const rect = btn.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+
+  e.preventDefault();
 }
 
 document.addEventListener("mousemove", drag);
-document.addEventListener("touchmove", drag);
+document.addEventListener("touchmove", drag, { passive: false });
 
 function drag(e) {
-  if (!holdTimer) return;
+  if (!dragging) return;
 
-  isDragging = true;
-  clearTimeout(holdTimer);
+  moved = true;
 
-  let x = e.touches ? e.touches[0].clientX : e.clientX;
-  let y = e.touches ? e.touches[0].clientY : e.clientY;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  btn.style.left = x - btn.offsetWidth / 2 + "px";
-  btn.style.top = y - btn.offsetHeight / 2 + "px";
+  btn.style.left = clientX - offsetX + "px";
+  btn.style.top = clientY - offsetY + "px";
   btn.style.right = "auto";
   btn.style.bottom = "auto";
+
+  e.preventDefault();
 }
 
-document.addEventListener("mouseup", stop);
-document.addEventListener("touchend", stop);
+document.addEventListener("mouseup", stopDrag);
+document.addEventListener("touchend", stopDrag);
 
-function stop() {
-  clearTimeout(holdTimer);
+function stopDrag() {
+  dragging = false;
 }
+
+/* ===== HOLD MENU (FIXED MOBILE) ===== */
+let holdTimer;
+
+btn.addEventListener("touchstart", startHold, { passive: false });
+btn.addEventListener("mousedown", startHold);
+
+function startHold(e) {
+  holdTimer = setTimeout(() => {
+    if (!dragging && !moved) openMenu();
+  }, 1500);
+}
+
+btn.addEventListener("touchend", () => clearTimeout(holdTimer));
+btn.addEventListener("mouseup", () => clearTimeout(holdTimer));
 
 /* ===== MENU POSITION ===== */
 function openMenu() {
   menu.style.display = "flex";
 
-  let rect = btn.getBoundingClientRect();
+  const rect = btn.getBoundingClientRect();
   let x = rect.left;
   let y = rect.top - 260;
 
@@ -154,14 +155,12 @@ document.addEventListener("click", (e) => {
   }
 });
 
-/* ===== PANIC ACTION ===== */
+/* ===== PANIC CLICK (FIXED) ===== */
 btn.addEventListener("click", () => {
-  const mode = localStorage.getItem("panicMode") || "blank";
+  if (moved) return; // 🔥 prevents accidental click after drag
 
-  if (mode === "google") window.location.href = "https://google.com";
-  if (mode === "blank") window.location.href = "about:blank";
-  if (mode === "hide") document.body.style.display = "none";
+  window.location.href = "about:blank";
 });
 
-/* ===== INIT ===== */
+/* INIT */
 applySettings();
