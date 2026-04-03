@@ -55,15 +55,18 @@ window.onload = () => {
     popupMessage.textContent = msg;
     popup.classList.add('show');
   }
-  popupClose.addEventListener('click', () => popup.classList.remove('show'));
+
+  if (popupClose) popupClose.addEventListener('click', () => popup.classList.remove('show'));
 
   if (isWebApp) {
-    webAppToggle.checked = true;
-    webAppToggle.disabled = true;
-    webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode cannot be turned off while in standalone mode.');
-    });
-  } else {
+    if (webAppToggle) {
+      webAppToggle.checked = true;
+      webAppToggle.disabled = true;
+      webAppToggle.addEventListener('click', () => {
+        showPopup('Web-App Mode cannot be turned off while in standalone mode.');
+      });
+    }
+  } else if (webAppToggle) {
     webAppToggle.checked = false;
     webAppToggle.disabled = true;
   }
@@ -71,7 +74,7 @@ window.onload = () => {
   [cloakButton, autoCloakToggle].forEach(el => {
     if (!el) return;
     el.addEventListener('click', e => {
-      if (webAppToggle.checked) {
+      if (webAppToggle?.checked) {
         e.preventDefault();
         if (el.type === 'checkbox') el.checked = false;
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
@@ -82,31 +85,19 @@ window.onload = () => {
   if (autoCloakToggle) {
     autoCloakToggle.checked = localStorage.getItem('autoCloak') === 'true';
     autoCloakToggle.addEventListener('change', () => {
-      if (!webAppToggle.checked) localStorage.setItem('autoCloak', autoCloakToggle.checked);
-      else { autoCloakToggle.checked = false; showPopup('This Setting Cannot Be Activated Due To Web-App Mode'); }
+      if (!webAppToggle?.checked) {
+        localStorage.setItem('autoCloak', autoCloakToggle.checked);
+      } else {
+        autoCloakToggle.checked = false;
+        showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
+      }
     });
   }
 
   if (panicButtonToggle) {
     panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
-    panicButtonToggle.addEventListener('change', () => { localStorage.setItem('panicButton', panicButtonToggle.checked); });
+    panicButtonToggle.addEventListener('change', () => {
+      localStorage.setItem('panicButton', panicButtonToggle.checked);
+    });
   }
-
-  // Keep theme on cloak button
-  cloakButton.style.background = "#e65c00";
-  cloakButton.style.color = "#fff";
-  cloakButton.style.border = "none";
-  cloakButton.style.boxShadow = "0 0 12px #e65c00,0 0 25px rgba(230,92,0,0.5)";
-  cloakButton.style.transition = "all 0.25s ease";
-
-  cloakButton.addEventListener("mouseover", () => {
-    cloakButton.style.background = "#ff6a00";
-    cloakButton.style.transform = "scale(1.05)";
-    cloakButton.style.boxShadow = "0 0 20px #fff,0 0 40px rgba(230,92,0,0.6)";
-  });
-  cloakButton.addEventListener("mouseout", () => {
-    cloakButton.style.background = "#e65c00";
-    cloakButton.style.transform = "scale(1)";
-    cloakButton.style.boxShadow = "0 0 12px #e65c00,0 0 25px rgba(230,92,0,0.5)";
-  });
 };
