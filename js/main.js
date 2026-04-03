@@ -1,5 +1,3 @@
-// main.js
-
 async function loadNav() {
   const res = await fetch("/components/nav.html");
   const data = await res.text();
@@ -57,10 +55,8 @@ window.onload = () => {
     popupMessage.textContent = msg;
     popup.classList.add('show');
   }
-
   popupClose.addEventListener('click', () => popup.classList.remove('show'));
 
-  // 🔹 Web app logic
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
@@ -72,7 +68,6 @@ window.onload = () => {
     webAppToggle.disabled = true;
   }
 
-  // 🔹 Block settings when web-app mode is on
   [cloakButton, autoCloakToggle].forEach(el => {
     if (!el) return;
     el.addEventListener('click', e => {
@@ -84,33 +79,34 @@ window.onload = () => {
     });
   });
 
-  // 🔹 Auto Cloak toggle (no actual cloak logic)
-  // 🔹 Auto Cloak toggle (no cloak logic)
   if (autoCloakToggle) {
     autoCloakToggle.checked = localStorage.getItem('autoCloak') === 'true';
-
-@@ -115,24 +115,5 @@
-        showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
-      }
-    });
-
-    // 🎨 THEMED BUTTON (NO ORANGE)
-    cloakButton.style.background = "#2a2a2a";
-    cloakButton.style.color = "#ffffff";
-    cloakButton.style.border = "1px solid #3a3a3a";
-    cloakButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
-    cloakButton.style.transition = "all 0.2s ease";
-
-    cloakButton.addEventListener("mouseover", () => {
-      cloakButton.style.background = "#333";
-      cloakButton.style.transform = "translateY(-1px)";
-      cloakButton.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
-    });
-
-    cloakButton.addEventListener("mouseout", () => {
-      cloakButton.style.background = "#2a2a2a";
-      cloakButton.style.transform = "none";
-      cloakButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
+    autoCloakToggle.addEventListener('change', () => {
+      if (!webAppToggle.checked) localStorage.setItem('autoCloak', autoCloakToggle.checked);
+      else { autoCloakToggle.checked = false; showPopup('This Setting Cannot Be Activated Due To Web-App Mode'); }
     });
   }
+
+  if (panicButtonToggle) {
+    panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
+    panicButtonToggle.addEventListener('change', () => { localStorage.setItem('panicButton', panicButtonToggle.checked); });
+  }
+
+  // Keep theme on cloak button
+  cloakButton.style.background = "#e65c00";
+  cloakButton.style.color = "#fff";
+  cloakButton.style.border = "none";
+  cloakButton.style.boxShadow = "0 0 12px #e65c00,0 0 25px rgba(230,92,0,0.5)";
+  cloakButton.style.transition = "all 0.25s ease";
+
+  cloakButton.addEventListener("mouseover", () => {
+    cloakButton.style.background = "#ff6a00";
+    cloakButton.style.transform = "scale(1.05)";
+    cloakButton.style.boxShadow = "0 0 20px #fff,0 0 40px rgba(230,92,0,0.6)";
+  });
+  cloakButton.addEventListener("mouseout", () => {
+    cloakButton.style.background = "#e65c00";
+    cloakButton.style.transform = "scale(1)";
+    cloakButton.style.boxShadow = "0 0 12px #e65c00,0 0 25px rgba(230,92,0,0.5)";
+  });
 };
