@@ -1,5 +1,7 @@
 // main.js
 
+let cloakWindow = null;
+
 // 🔹 Load Nav
 async function loadNav() {
   const res = await fetch("/components/nav.html");
@@ -14,7 +16,7 @@ async function loadNav() {
   });
 }
 
-// 🔥 GLOBAL TRANSITIONS (works on all links)
+// 🔥 GLOBAL TRANSITIONS (for normal navigation ONLY)
 function setupTransitions() {
   document.addEventListener("click", function(e) {
     const link = e.target.closest("a");
@@ -33,7 +35,7 @@ function setupTransitions() {
   });
 }
 
-// 🔥 CLEAN FADE HANDLER
+// 🔥 FADE (used only for subpages)
 function fadeThen(callback) {
   document.body.classList.remove("fade-in");
   document.body.classList.add("fade-out");
@@ -61,25 +63,53 @@ function showPopup(msg) {
   popup.classList.add('show');
 }
 
-// 🔥 MOBILE-SAFE CLOAK (FINAL FIX)
+// 🔥 MOBILE ABOUT:BLANK CLOAK (DOUBLE CLICK, NO TRANSITIONS)
 function openCloak() {
-  const cloakURL = window.location.origin + "/settings/index.html";
+  // FIRST CLICK → open blank tab
+  if (!cloakWindow || cloakWindow.closed) {
+    cloakWindow = window.open('about:blank', '_blank');
 
-  // Preload page
-  const iframe = document.createElement("iframe");
-  iframe.src = cloakURL;
-  iframe.style.display = "none";
-  document.body.appendChild(iframe);
-
-  setTimeout(() => {
-    const newTab = window.open(cloakURL, "_blank");
-
-    if (newTab) {
-      window.location.replace("https://www.google.com");
-    } else {
-      window.location.href = cloakURL;
+    if (!cloakWindow) {
+      showPopup('Popup blocked! Tap again or allow popups.');
+      return;
     }
-  }, 150);
+
+    showPopup('Tap again to activate cloak');
+    return;
+  }
+
+  // SECOND CLICK → inject your site
+  const url = window.location.origin + "/settings/index.html";
+
+  cloakWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Settings</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          html, body {
+            margin: 0;
+            height: 100%;
+            background: #0f0f0f;
+          }
+          iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+          }
+        </style>
+      </head>
+      <body>
+        <iframe src="${url}"></iframe>
+      </body>
+    </html>
+  `);
+
+  cloakWindow.document.close();
+
+  // redirect current tab
+  window.location.replace("https://www.ixl.com");
 }
 
 // 🔹 DOM Ready
@@ -115,15 +145,11 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔥 Cloak button
+  // 🔥 Cloak button (NO TRANSITIONS)
   if (cloakButton) {
     cloakButton.addEventListener('click', () => {
       if (!webAppToggle.checked) {
-        fadeThen(() => {
-          requestAnimationFrame(() => {
-            openCloak();
-          });
-        });
+        openCloak(); // 🚫 NO fade
       } else {
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
       }
@@ -138,11 +164,7 @@ window.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem('autoCloak', autoCloakToggle.checked);
 
       if (autoCloakToggle.checked && !webAppToggle.checked) {
-        fadeThen(() => {
-          requestAnimationFrame(() => {
-            openCloak();
-          });
-        });
+        openCloak(); // 🚫 NO fade
       } else if (webAppToggle.checked) {
         autoCloakToggle.checked = false;
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
@@ -150,11 +172,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     if (autoCloakToggle.checked && !webAppToggle.checked) {
-      fadeThen(() => {
-        requestAnimationFrame(() => {
-          openCloak();
-        });
-      });
+      openCloak(); // 🚫 NO fade
     }
   }
 
