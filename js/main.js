@@ -1,6 +1,7 @@
 // main.js
 
 let cloakWindow = null;
+let cloakReady = false;
 
 // 🔹 Load Nav
 async function loadNav() {
@@ -16,7 +17,7 @@ async function loadNav() {
   });
 }
 
-// 🔥 GLOBAL TRANSITIONS (for normal navigation ONLY)
+// 🔥 GLOBAL TRANSITIONS (NORMAL LINKS ONLY)
 function setupTransitions() {
   document.addEventListener("click", function(e) {
     const link = e.target.closest("a");
@@ -35,7 +36,7 @@ function setupTransitions() {
   });
 }
 
-// 🔥 FADE (used only for subpages)
+// 🔥 FADE
 function fadeThen(callback) {
   document.body.classList.remove("fade-in");
   document.body.classList.add("fade-out");
@@ -63,53 +64,60 @@ function showPopup(msg) {
   popup.classList.add('show');
 }
 
-// 🔥 MOBILE ABOUT:BLANK CLOAK (DOUBLE CLICK, NO TRANSITIONS)
+// 🔥 FROGIES-STYLE CLOAK (REAL FIX)
 function openCloak() {
-  // FIRST CLICK → open blank tab
-  if (!cloakWindow || cloakWindow.closed) {
+
+  // FIRST CLICK → open hidden blank tab
+  if (!cloakReady) {
     cloakWindow = window.open('about:blank', '_blank');
 
     if (!cloakWindow) {
-      showPopup('Popup blocked! Tap again or allow popups.');
+      showPopup('Allow popups and try again.');
       return;
     }
 
-    showPopup('Tap again to activate cloak');
-    return;
+    // Make it look blank instantly
+    cloakWindow.document.write("<title></title>");
+    cloakWindow.document.close();
+
+    cloakReady = true;
+    return; // nothing visible happens
   }
 
-  // SECOND CLICK → inject your site
-  const url = window.location.origin + "/settings/index.html";
+  // SECOND CLICK → inject real site
+  if (cloakWindow && !cloakWindow.closed) {
+    const url = window.location.origin + "/settings/index.html";
 
-  cloakWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Settings</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          html, body {
-            margin: 0;
-            height: 100%;
-            background: #0f0f0f;
-          }
-          iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-          }
-        </style>
-      </head>
-      <body>
-        <iframe src="${url}"></iframe>
-      </body>
-    </html>
-  `);
+    cloakWindow.document.open();
+    cloakWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Settings</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            html, body {
+              margin: 0;
+              height: 100%;
+              background: #0f0f0f;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+          </style>
+        </head>
+        <body>
+          <iframe src="${url}"></iframe>
+        </body>
+      </html>
+    `);
+    cloakWindow.document.close();
 
-  cloakWindow.document.close();
-
-  // redirect current tab
-  window.location.replace("https://www.ixl.com");
+    // redirect current tab
+    window.location.replace("https://www.ixl.com");
+  }
 }
 
 // 🔹 DOM Ready
@@ -125,31 +133,23 @@ window.addEventListener("DOMContentLoaded", () => {
   const panicButtonToggle = document.querySelector('.setting-card:nth-child(3) input[type="checkbox"]');
   const webAppToggle = document.querySelector('.setting-card:nth-child(4) input[type="checkbox"]');
 
-  // Popup close
   document.getElementById('popup-close').addEventListener('click', () => {
     document.getElementById('settings-popup').classList.remove('show');
   });
 
-  // Web-app logic
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
-    webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode cannot be turned off in standalone mode.');
-    });
   } else {
     webAppToggle.checked = false;
     webAppToggle.disabled = true;
-    webAppToggle.addEventListener('click', () => {
-      showPopup('Web-App Mode can only be enabled in mobile web app.');
-    });
   }
 
-  // 🔥 Cloak button (NO TRANSITIONS)
+  // 🔥 CLOAK BUTTON (NO TRANSITIONS)
   if (cloakButton) {
     cloakButton.addEventListener('click', () => {
       if (!webAppToggle.checked) {
-        openCloak(); // 🚫 NO fade
+        openCloak();
       } else {
         showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
       }
@@ -162,18 +162,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     autoCloakToggle.addEventListener('change', () => {
       localStorage.setItem('autoCloak', autoCloakToggle.checked);
-
       if (autoCloakToggle.checked && !webAppToggle.checked) {
-        openCloak(); // 🚫 NO fade
-      } else if (webAppToggle.checked) {
-        autoCloakToggle.checked = false;
-        showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
+        openCloak();
       }
     });
-
-    if (autoCloakToggle.checked && !webAppToggle.checked) {
-      openCloak(); // 🚫 NO fade
-    }
   }
 
   // 🔹 Panic toggle
@@ -181,22 +173,6 @@ window.addEventListener("DOMContentLoaded", () => {
     panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
     panicButtonToggle.addEventListener('change', () => {
       localStorage.setItem('panicButton', panicButtonToggle.checked);
-    });
-  }
-
-  // 🔹 Cloak button styling
-  if (cloakButton) {
-    cloakButton.style.background = "#e65c00";
-    cloakButton.style.boxShadow = "0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5)";
-
-    cloakButton.addEventListener("mouseover", () => {
-      cloakButton.style.transform = "scale(1.05)";
-      cloakButton.style.boxShadow = "0 0 20px #e65c00, 0 0 40px rgba(230,92,0,0.6)";
-    });
-
-    cloakButton.addEventListener("mouseout", () => {
-      cloakButton.style.transform = "scale(1)";
-      cloakButton.style.boxShadow = "0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5)";
     });
   }
 });
