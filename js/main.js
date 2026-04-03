@@ -1,8 +1,5 @@
 // main.js
 
-// --------------------------
-// Load Navigation
-// --------------------------
 async function loadNav() {
   const res = await fetch("/components/nav.html");
   const data = await res.text();
@@ -18,9 +15,6 @@ async function loadNav() {
   setupTransitions();
 }
 
-// --------------------------
-// Page Transitions
-// --------------------------
 function setupTransitions() {
   document.querySelectorAll("a").forEach(link => {
     if (link.hostname === window.location.hostname) {
@@ -39,17 +33,11 @@ function setupTransitions() {
   });
 }
 
-// --------------------------
-// Web-App Detection
-// --------------------------
 function detectWebAppMode() {
   return window.matchMedia('(display-mode: standalone)').matches
        || window.navigator.standalone === true;
 }
 
-// --------------------------
-// DOM Ready
-// --------------------------
 window.onload = () => {
   document.body.classList.add("fade-in");
   loadNav();
@@ -65,9 +53,6 @@ window.onload = () => {
   const popupMessage = document.getElementById('popup-message');
   const popupClose = document.getElementById('popup-close');
 
-  // --------------------------
-  // Popup Logic
-  // --------------------------
   function showPopup(msg) {
     popupMessage.textContent = msg;
     popup.classList.add('show');
@@ -75,9 +60,6 @@ window.onload = () => {
 
   popupClose.addEventListener('click', () => popup.classList.remove('show'));
 
-  // --------------------------
-  // Web-App Toggle
-  // --------------------------
   if (isWebApp) {
     webAppToggle.checked = true;
     webAppToggle.disabled = true;
@@ -89,9 +71,6 @@ window.onload = () => {
     webAppToggle.disabled = true;
   }
 
-  // --------------------------
-  // Prevent Cloak/AutoCloak in Web-App
-  // --------------------------
   [cloakButton, autoCloakToggle].forEach(el => {
     if (!el) return;
     el.addEventListener('click', e => {
@@ -103,9 +82,6 @@ window.onload = () => {
     });
   });
 
-  // --------------------------
-  // Auto Cloak Toggle
-  // --------------------------
   if (autoCloakToggle) {
     autoCloakToggle.checked = localStorage.getItem('autoCloak') === 'true';
     autoCloakToggle.addEventListener('change', () => {
@@ -118,9 +94,6 @@ window.onload = () => {
     });
   }
 
-  // --------------------------
-  // Panic Toggle
-  // --------------------------
   if (panicButtonToggle) {
     panicButtonToggle.checked = localStorage.getItem('panicButton') === 'true';
     panicButtonToggle.addEventListener('change', () => {
@@ -128,12 +101,8 @@ window.onload = () => {
     });
   }
 
-  // --------------------------
-  // Cloak Button (no about:blank)
-  // --------------------------
   cloakButton?.addEventListener('click', () => {
     if (!webAppToggle.checked) {
-      showPopup('Cloak button pressed (no about:blank logic).');
       console.log('Cloak Activated!');
     } else {
       showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
