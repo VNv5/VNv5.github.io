@@ -50,7 +50,6 @@ const ACTION_MAP = {
 
 /* ===== APPLY SETTINGS ===== */
 function applySettings() {
-  const enabled = localStorage.getItem("panicEnabled") === "true";
   const size = localStorage.getItem("panicSize") || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
   const locked = localStorage.getItem("panicLocked") === "true";
@@ -58,7 +57,8 @@ function applySettings() {
   const savedX = localStorage.getItem("panicX");
   const savedY = localStorage.getItem("panicY");
 
-  btn.style.display = enabled ? "flex" : "none";
+  // ✅ ALWAYS SHOW
+  btn.style.display = "flex";
 
   const dim = SIZE_MAP[size];
   btn.style.width = dim + "px";
@@ -73,7 +73,7 @@ function applySettings() {
     btn.style.bottom = "auto";
   }
 
-  // ✅ FIX ACTIVE STATES
+  // ACTIVE STATES
   document.querySelectorAll("[data-size]").forEach(b => {
     b.classList.toggle("active", b.dataset.size === size);
   });
@@ -91,7 +91,7 @@ function applySettings() {
   }
 }
 
-/* ===== SIZE (FIXED BUG) ===== */
+/* ===== SIZE ===== */
 document.addEventListener("click", (e) => {
   if (!e.target.dataset.size) return;
 
@@ -101,7 +101,7 @@ document.addEventListener("click", (e) => {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  const newDim = SIZE_MAP[newSize]; // ✅ FIXED
+  const newDim = SIZE_MAP[newSize];
 
   btn.style.width = newDim + "px";
   btn.style.height = newDim + "px";
@@ -116,7 +116,7 @@ document.addEventListener("click", (e) => {
   localStorage.setItem("panicX", newLeft);
   localStorage.setItem("panicY", newTop);
 
-  applySettings(); // ✅ ensures orange highlight updates
+  applySettings();
 });
 
 /* ===== ACTION ===== */
@@ -124,7 +124,7 @@ document.addEventListener("click", (e) => {
   if (!e.target.dataset.action) return;
 
   localStorage.setItem("panicAction", e.target.dataset.action);
-  applySettings(); // ✅ FIX highlight
+  applySettings();
 });
 
 /* ===== OPACITY ===== */
@@ -143,7 +143,7 @@ document.getElementById("panic-lock").onclick = () => {
   applySettings();
 };
 
-/* ===== DRAG (MOBILE FIX ONLY) ===== */
+/* ===== DRAG (SMOOTH + MOBILE FIX) ===== */
 let dragging = false;
 let offsetX = 0;
 let offsetY = 0;
@@ -172,14 +172,14 @@ btn.addEventListener("pointermove", (e) => {
 });
 
 btn.addEventListener("pointerup", () => {
-  if (dragging && dragMoved) {
+  if (dragMoved) {
     localStorage.setItem("panicX", parseFloat(btn.style.left));
     localStorage.setItem("panicY", parseFloat(btn.style.top));
   }
   dragging = false;
 });
 
-/* ===== HOLD MENU (v1 behavior, FIXED) ===== */
+/* ===== HOLD MENU ===== */
 let holdTimer;
 let menuJustOpened = false;
 
