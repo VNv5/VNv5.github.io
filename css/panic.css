@@ -1,10 +1,14 @@
+/* =========================
+   PANIC BUTTON
+========================= */
 #panic-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
+
   border-radius: 50%;
 
-  /* slimmer look */
+  /* THIN STYLE */
   background-color: transparent;
   border: 2px solid #e65c00;
 
@@ -17,42 +21,75 @@
   display: none;
 
   cursor: grab;
-  touch-action: none;
 
+  /* MOBILE FIXES */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  /* RENDER FIX (important for mobile hitbox accuracy) */
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   will-change: transform;
 
-  transition: all 0.2s ease;
+  /* SMOOTHNESS */
+  transition:
+    opacity 0.2s ease,
+    width 0.2s ease,
+    height 0.2s ease,
+    transform 0.15s ease;
 
-  /* glow instead of fill */
+  /* GLOW */
   box-shadow:
-    0 0 6px rgba(230,92,0,0.6),
-    0 0 14px rgba(230,92,0,0.3);
+    0 0 6px rgba(230,92,0,0.7),
+    0 0 16px rgba(230,92,0,0.35);
 }
 
+/* Remove ALL mobile highlight everywhere inside button */
+#panic-btn, #panic-btn * {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+}
+
+/* Click feel */
 #panic-btn:active {
   transform: scale(1.08);
+  cursor: grabbing;
 }
 
-/* sizes */
+/* =========================
+   SIZES
+========================= */
 .panic-small  { width: 45px; height: 45px; }
 .panic-medium { width: 65px; height: 65px; }
 .panic-large  { width: 90px; height: 90px; }
 
-/* ===== MENU ===== */
+/* =========================
+   MENU
+========================= */
 #panic-menu {
   position: fixed;
   width: 260px;
   max-width: 80vw;
+
   background: rgba(17,17,17,0.97);
   border-radius: 18px;
   padding: 18px;
+
   display: none;
   flex-direction: column;
   gap: 14px;
+
   z-index: 10000;
-  box-shadow: 0 0 20px rgba(230,92,0,0.5), 0 0 40px rgba(230,92,0,0.2);
-  animation: panicPop 0.2s ease;
+
+  box-shadow:
+    0 0 20px rgba(230,92,0,0.5),
+    0 0 40px rgba(230,92,0,0.2);
+
+  animation: panicPop 0.18s ease;
 }
 
 @keyframes panicPop {
@@ -60,7 +97,9 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Section labels */
+/* =========================
+   SECTION LABELS
+========================= */
 .panic-section {
   font-size: 0.78rem;
   font-weight: 600;
@@ -70,7 +109,9 @@
   margin-bottom: 6px;
 }
 
-/* Option button rows */
+/* =========================
+   OPTIONS
+========================= */
 .panic-options {
   display: flex;
   gap: 6px;
@@ -79,13 +120,18 @@
 .panic-options button {
   flex: 1;
   padding: 8px 4px;
+
   border: 1px solid #2a2a2a;
   border-radius: 10px;
+
   background: #1a1a1a;
   color: #aaa;
+
   font-size: 0.82rem;
   font-weight: 600;
+
   cursor: pointer;
+
   transition: all 0.2s ease;
 }
 
@@ -99,25 +145,36 @@
   background: #e65c00;
   color: #fff;
   border-color: #e65c00;
+
   box-shadow: 0 0 8px rgba(230,92,0,0.6);
 }
 
-/* Lock toggle row */
+/* =========================
+   LOCK ROW
+========================= */
 .panic-lock {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
+
   padding: 10px 12px;
   border-radius: 10px;
+
   cursor: pointer;
+
   font-size: 0.88rem;
   color: #aaa;
+
   transition: all 0.2s ease;
 }
 
-.panic-lock:hover { background: #222; color: #fff; }
+.panic-lock:hover {
+  background: #222;
+  color: #fff;
+}
 
 #lock-state {
   font-weight: 700;
@@ -126,7 +183,9 @@
   color: #e65c00;
 }
 
-/* ===== TRANSPARENCY SLIDER ===== */
+/* =========================
+   SLIDER
+========================= */
 .panic-slider-wrap {
   padding: 4px 0;
 }
@@ -134,9 +193,12 @@
 #panic-opacity {
   -webkit-appearance: none;
   appearance: none;
+
   width: 100%;
   height: 6px;
+
   border-radius: 6px;
+
   background: linear-gradient(
     to right,
     #e65c00 0%,
@@ -144,35 +206,41 @@
     #2a2a2a calc(var(--val, 100) * 1%),
     #2a2a2a 100%
   );
+
   outline: none;
   cursor: pointer;
 }
 
+/* Thumb */
 #panic-opacity::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
+
   width: 18px;
   height: 18px;
+
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 6px rgba(230,92,0,0.7), 0 1px 4px rgba(0,0,0,0.5);
+
+  box-shadow:
+    0 0 6px rgba(230,92,0,0.7),
+    0 1px 4px rgba(0,0,0,0.5);
+
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 #panic-opacity::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 10px rgba(230,92,0,0.9), 0 1px 4px rgba(0,0,0,0.5);
 }
 
+/* Firefox */
 #panic-opacity::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border: none;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 6px rgba(230,92,0,0.7);
-  cursor: pointer;
 }
 
 #panic-opacity::-moz-range-track {
