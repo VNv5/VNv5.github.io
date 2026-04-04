@@ -47,17 +47,21 @@ const ACTION_MAP = {
   docs: "https://docs.google.com/document"
 };
 
+/* =========================
+   SETTINGS
+========================= */
 function applySettings() {
   const enabled = localStorage.getItem("panicEnabled") === "true";
   const size = localStorage.getItem("panicSize") || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
+  const locked = localStorage.getItem("panicLocked") === "true";
+  const action = localStorage.getItem("panicAction") || "classroom";
   const savedX = localStorage.getItem("panicX");
   const savedY = localStorage.getItem("panicY");
 
   btn.style.display = enabled ? "flex" : "none";
 
   btn.className = "";
-  btn.id = "panic-btn";
   btn.classList.add(`panic-${size}`);
 
   const dim = SIZE_MAP[size];
@@ -72,10 +76,26 @@ function applySettings() {
     btn.style.right = "auto";
     btn.style.bottom = "auto";
   }
+
+  document.querySelectorAll("[data-size]").forEach(b =>
+    b.classList.toggle("active", b.dataset.size === size)
+  );
+
+  document.querySelectorAll("[data-action]").forEach(b =>
+    b.classList.toggle("active", b.dataset.action === action)
+  );
+
+  document.getElementById("lock-state").textContent = locked ? "ON" : "OFF";
+
+  const opacityEl = document.getElementById("panic-opacity");
+  if (opacityEl) {
+    opacityEl.value = opacity;
+    opacityEl.style.setProperty("--val", opacity);
+  }
 }
 
 /* =========================
-   SIZE FIX
+   SIZE (FIXED v1 LOGIC)
 ========================= */
 document.addEventListener("click", (e) => {
   if (!e.target.dataset.size) return;
@@ -86,10 +106,9 @@ document.addEventListener("click", (e) => {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  const newDim = SIZE_MAP[newSize];
+  const newDim = SIZE_MAP[newSize]; // correct order
 
   btn.className = "";
-  btn.id = "panic-btn";
   btn.classList.add(`panic-${newSize}`);
 
   btn.style.width = newDim + "px";
@@ -107,79 +126,84 @@ document.addEventListener("click", (e) => {
 });
 
 /* =========================
-   DRAG + HOLD (CLEAN)
+   DRAG + HOLD (STABLE)
 ========================= */
 let dragging = false;
-let moved = false;
+let dragMoved = false;
 let holdTimer = null;
-let startX = 0;
-let startY = 0;
+let menuJustOpened = false;
+
 let offsetX = 0;
 let offsetY = 0;
 
-const HOLD_TIME = 550;
-const MOVE_THRESHOLD = 6;
+const DRAG_THRESHOLD = 6;
+const HOLD_TIME = 600;
+
+btn.addEventListener("mousedown", start);
+btn.addEventListener("touchstart", start, { passive: false });
 
 function start(e) {
-  const touch = e.touches ? e.touches[0] : e;
+  const locked = localStorage.getItem("panicLocked") === "true";
+  if (locked) return;
 
   dragging = true;
-  moved = false;
+  dragMoved = false;
 
-  startX = touch.clientX;
-  startY = touch.clientY;
-
+  const touch = e.touches ? e.touches[0] : e;
   const rect = btn.getBoundingClientRect();
+
   offsetX = touch.clientX - rect.left;
   offsetY = touch.clientY - rect.top;
 
+  clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
-    if (!moved) openMenu();
+    if (!dragMoved) {
+      menuJustOpened = true;
+      openMenu();
+    }
   }, HOLD_TIME);
 
   e.preventDefault();
 }
+
+document.addEventListener("mousemove", move);
+document.addEventListener("touchmove", move, { passive: false });
 
 function move(e) {
   if (!dragging) return;
 
   const touch = e.touches ? e.touches[0] : e;
 
-  const dx = Math.abs(touch.clientX - startX);
-  const dy = Math.abs(touch.clientY - startY);
+  const newLeft = touch.clientX - offsetX;
+  const newTop = touch.clientY - offsetY;
 
-  if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
-    moved = true;
+  const dx = newLeft - (parseFloat(btn.style.left) || 0);
+  const dy = newTop - (parseFloat(btn.style.top) || 0);
+
+  if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+    dragMoved = true;
     clearTimeout(holdTimer);
   }
 
-  if (moved) {
-    btn.style.left = (touch.clientX - offsetX) + "px";
-    btn.style.top = (touch.clientY - offsetY) + "px";
-  }
+  btn.style.left = newLeft + "px";
+  btn.style.top = newTop + "px";
 
   e.preventDefault();
 }
 
+document.addEventListener("mouseup", end);
+document.addEventListener("touchend", end);
+
 function end() {
   clearTimeout(holdTimer);
 
-  if (dragging && moved) {
+  if (dragging && dragMoved) {
     localStorage.setItem("panicX", parseFloat(btn.style.left));
     localStorage.setItem("panicY", parseFloat(btn.style.top));
   }
 
   dragging = false;
 }
-
-btn.addEventListener("mousedown", start);
-btn.addEventListener("touchstart", start, { passive: false });
-
-document.addEventListener("mousemove", move);
-document.addEventListener("touchmove", move, { passive: false });
-
-document.addEventListener("mouseup", end);
-document.addEventListener("touchend", end);
 
 /* =========================
    MENU
@@ -189,7 +213,7 @@ function openMenu() {
 
   const rect = btn.getBoundingClientRect();
   let x = rect.left;
-  let y = rect.top - 300;
+  let y = rect.top - 310;
 
   if (x + 260 > window.innerWidth) x = window.innerWidth - 270;
   if (y < 0) y = rect.bottom + 10;
@@ -205,14 +229,45 @@ document.addEventListener("click", (e) => {
 });
 
 /* =========================
-   CLICK
+   CLICK ACTION
 ========================= */
 btn.addEventListener("click", () => {
-  if (moved) return;
+  if (dragMoved) {
+    dragMoved = false;
+    return;
+  }
+
+  if (menuJustOpened) {
+    menuJustOpened = false;
+    return;
+  }
 
   const action = localStorage.getItem("panicAction") || "classroom";
   window.location.href = ACTION_MAP[action];
 });
+
+/* =========================
+   OTHER SETTINGS
+========================= */
+document.addEventListener("click", (e) => {
+  if (e.target.dataset.action) {
+    localStorage.setItem("panicAction", e.target.dataset.action);
+  }
+});
+
+document.addEventListener("input", (e) => {
+  if (e.target.id === "panic-opacity") {
+    localStorage.setItem("panicOpacity", e.target.value);
+    btn.style.opacity = e.target.value / 100;
+    e.target.style.setProperty("--val", e.target.value);
+  }
+});
+
+document.getElementById("panic-lock").onclick = () => {
+  const locked = localStorage.getItem("panicLocked") === "true";
+  localStorage.setItem("panicLocked", String(!locked));
+  applySettings();
+};
 
 /* INIT */
 applySettings();
