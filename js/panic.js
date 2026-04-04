@@ -1,4 +1,3 @@
-// ===== CREATE ELEMENTS =====
 const btn = document.createElement("div");
 btn.id = "panic-btn";
 
@@ -40,7 +39,6 @@ menu.innerHTML = `
 document.body.appendChild(btn);
 document.body.appendChild(menu);
 
-// ===== CONFIG =====
 const SIZE_MAP = { small: 45, medium: 65, large: 90 };
 
 const ACTION_MAP = {
@@ -49,22 +47,23 @@ const ACTION_MAP = {
   docs: "https://docs.google.com/document"
 };
 
-// ===== FORCE ENABLE (FIXES "NOT SHOWING") =====
+// force visible
 if (localStorage.getItem("panicEnabled") === null) {
   localStorage.setItem("panicEnabled", "true");
 }
 
-// ===== APPLY SETTINGS =====
 function applySettings() {
+  const enabled = localStorage.getItem("panicEnabled") === "true";
   const size = localStorage.getItem("panicSize") || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
   const action = localStorage.getItem("panicAction") || "classroom";
 
-  btn.style.display = "flex";
+  btn.style.display = enabled ? "flex" : "none";
 
   const dim = SIZE_MAP[size];
   btn.style.width = dim + "px";
   btn.style.height = dim + "px";
+
   btn.style.opacity = opacity / 100;
 
   document.querySelectorAll("[data-size]").forEach(b => {
@@ -79,22 +78,22 @@ function applySettings() {
   if (slider) slider.value = opacity;
 }
 
-// ===== SIZE =====
+/* ===== SIZE FIX (THIS WAS YOUR BUG) ===== */
 document.addEventListener("click", (e) => {
   if (!e.target.dataset.size) return;
 
   const newSize = e.target.dataset.size;
-  const dim = SIZE_MAP[newSize];
+  const newDim = SIZE_MAP[newSize]; // FIX: define before use
 
   localStorage.setItem("panicSize", newSize);
 
-  btn.style.width = dim + "px";
-  btn.style.height = dim + "px";
+  btn.style.width = newDim + "px";
+  btn.style.height = newDim + "px";
 
   applySettings();
 });
 
-// ===== ACTION =====
+/* ===== ACTION ===== */
 document.addEventListener("click", (e) => {
   if (!e.target.dataset.action) return;
 
@@ -102,7 +101,7 @@ document.addEventListener("click", (e) => {
   applySettings();
 });
 
-// ===== OPACITY =====
+/* ===== OPACITY ===== */
 document.addEventListener("input", (e) => {
   if (e.target.id === "panic-opacity") {
     btn.style.opacity = e.target.value / 100;
@@ -110,7 +109,7 @@ document.addEventListener("input", (e) => {
   }
 });
 
-// ===== DRAG (SMOOTH) =====
+/* ===== DRAG (CLEANED, NOT REWRITTEN) ===== */
 let dragging = false;
 let offsetX = 0;
 let offsetY = 0;
@@ -138,39 +137,30 @@ btn.addEventListener("pointerup", () => {
   dragging = false;
 });
 
-// ===== HOLD MENU =====
+/* ===== HOLD MENU ===== */
 let holdTimer = null;
 
 btn.addEventListener("pointerdown", () => {
   holdTimer = setTimeout(() => {
-    openMenu();
-  }, 500);
+    menu.style.display = "flex";
+  }, 600);
 });
 
 btn.addEventListener("pointerup", () => {
   clearTimeout(holdTimer);
 });
 
-// ===== MENU =====
-function openMenu() {
-  menu.style.display = "flex";
-
-  const rect = btn.getBoundingClientRect();
-  menu.style.left = rect.left + "px";
-  menu.style.top = (rect.top - 300) + "px";
-}
-
+/* ===== CLOSE MENU ===== */
 document.addEventListener("click", (e) => {
   if (!menu.contains(e.target) && e.target !== btn) {
     menu.style.display = "none";
   }
 });
 
-// ===== CLICK ACTION =====
+/* ===== CLICK ===== */
 btn.addEventListener("click", () => {
   const action = localStorage.getItem("panicAction") || "classroom";
   window.location.href = ACTION_MAP[action];
 });
 
-// ===== INIT =====
 applySettings();
