@@ -121,19 +121,13 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(34px);
 }
-
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 8px rgba(230,92,0,0.7); }
-  50% { box-shadow: 0 0 16px rgba(230,92,0,0.9); }
-  100% { box-shadow: 0 0 8px rgba(230,92,0,0.7); }
-}
 </style>
 </head>
 
 <body>
 
 <header class="site-header">
-  <img src="../images/logo.png" class="logo" />
+  <img src="../images/logo.png" />
 </header>
 
 <main>
@@ -180,7 +174,7 @@ input:checked + .slider:before {
   <p>&copy; 2026 The Carey Network — All rights reserved.</p>
 </footer>
 
-<!-- ✅ LOAD NAVBAR -->
+<!-- ===== LOAD NAVBAR ===== -->
 <script>
 fetch('/components/nav.html')
   .then(res => res.text())
@@ -189,36 +183,32 @@ fetch('/components/nav.html')
   });
 </script>
 
-<!-- MAIN -->
+<!-- ===== MAIN JS ===== -->
 <script src="/js/main.js"></script>
 
-<!-- PANIC -->
+<!-- ===== PANIC JS ===== -->
 <script src="/js/panic.js" defer></script>
 
-<!-- SETTINGS SYNC -->
+<!-- ===== SETTINGS SYNC ===== -->
 <script>
 const panicToggle = document.getElementById("panicToggle");
 
 function updatePanicVisibility() {
   const btn = document.getElementById("panic-btn");
   if (!btn) return;
-
-  const enabled = localStorage.getItem("panicEnabled") === "true";
+  const enabled = panicToggle.checked;
   btn.style.display = enabled ? "flex" : "none";
+  localStorage.setItem("panicEnabled", enabled);
 }
 
+// ✅ Load stored value
 if (panicToggle) {
   const saved = localStorage.getItem("panicEnabled") === "true";
   panicToggle.checked = saved;
+  updatePanicVisibility();
 
-  panicToggle.addEventListener("change", () => {
-    localStorage.setItem("panicEnabled", panicToggle.checked);
-    updatePanicVisibility(); // 🔥 THIS IS THE FIX
-  });
+  panicToggle.addEventListener("change", updatePanicVisibility);
 }
-
-/* also run once in case */
-window.addEventListener("load", updatePanicVisibility);
 </script>
 
 </body>
