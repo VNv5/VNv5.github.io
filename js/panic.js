@@ -90,8 +90,6 @@ let holdActivated = false;
 
 function startInteraction(e) {
   const locked = localStorage.getItem("panicLocked") === "true";
-  if (locked) return;
-
   moved = false;
   holdActivated = false;
 
@@ -115,7 +113,7 @@ function startInteraction(e) {
 }
 
 function moveInteraction(e) {
-  if (!startX) return;
+  const locked = localStorage.getItem("panicLocked") === "true";
 
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -123,27 +121,25 @@ function moveInteraction(e) {
   const dx = Math.abs(clientX - startX);
   const dy = Math.abs(clientY - startY);
 
-  if (dx > 5 || dy > 5) {
+  if (!locked && (dx > 5 || dy > 5)) {
     isDragging = true;
     moved = true;
     clearTimeout(holdTimer);
     holdTimer = null;
+
+    const x = clientX - offsetX;
+    const y = clientY - offsetY;
+
+    btn.style.left = x + "px";
+    btn.style.top = y + "px";
+    btn.style.right = "auto";
+    btn.style.bottom = "auto";
   }
-
-  if (!isDragging) return;
-
-  const x = clientX - offsetX;
-  const y = clientY - offsetY;
-
-  btn.style.left = x + "px";
-  btn.style.top = y + "px";
-  btn.style.right = "auto";
-  btn.style.bottom = "auto";
 
   e.preventDefault();
 }
 
-function endInteraction() {
+function endInteraction(e) {
   clearTimeout(holdTimer);
   holdTimer = null;
   isDragging = false;
