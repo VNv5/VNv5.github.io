@@ -23,7 +23,7 @@
   cursor: grabbing;
 }
 
-/* ✅ REAL SIZE CHANGES */
+/* ✅ SIZE CLASSES */
 .panic-small {
   width: 45px;
   height: 45px;
@@ -75,6 +75,8 @@
   border-radius: 10px;
   background: #222;
   color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .panic-options button.active {
   background: #e65c00;
