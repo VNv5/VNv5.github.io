@@ -1,14 +1,12 @@
-// ===== CREATE ELEMENTS =====
+// ===== CREATE BUTTON & MENU =====
 const btn = document.createElement("div");
 btn.id = "panic-btn";
-
 const img = document.createElement("img");
 img.src = "/images/panicbutton.png";
 btn.appendChild(img);
 
 const menu = document.createElement("div");
 menu.id = "panic-menu";
-
 menu.innerHTML = `
 <div id="panic-menu-header">
   <span>Panic Settings</span>
@@ -48,7 +46,6 @@ function applySettings() {
   btn.style.display = enabled ? "flex" : "none";
   btn.className = `panic-${size}`;
   btn.style.opacity = opacity / 100;
-
   document.getElementById("panic-opacity").value = opacity;
   document.getElementById("lock-state").textContent = locked ? "ON" : "OFF";
 
@@ -58,14 +55,14 @@ function applySettings() {
 }
 
 // ===== MENU INTERACTIONS =====
-document.addEventListener("click", (e) => {
+document.addEventListener("click", e => {
   if (e.target.dataset.size) {
     localStorage.setItem("panicSize", e.target.dataset.size);
     applySettings();
   }
 });
 
-document.addEventListener("input", (e) => {
+document.addEventListener("input", e => {
   if (e.target.id === "panic-opacity") {
     localStorage.setItem("panicOpacity", e.target.value);
     btn.style.opacity = e.target.value / 100;
@@ -80,7 +77,7 @@ document.getElementById("panic-lock").onclick = () => {
 
 document.getElementById("panic-close").onclick = () => menu.style.display = "none";
 
-// ===== DRAG + HOLD LOGIC =====
+// ===== DRAG + LONG-PRESS =====
 let isDragging = false;
 let startX = 0, startY = 0;
 let offsetX = 0, offsetY = 0;
@@ -114,7 +111,6 @@ function startInteraction(e) {
 
 function moveInteraction(e) {
   const locked = localStorage.getItem("panicLocked") === "true";
-
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -135,11 +131,10 @@ function moveInteraction(e) {
     btn.style.right = "auto";
     btn.style.bottom = "auto";
   }
-
   e.preventDefault();
 }
 
-function endInteraction(e) {
+function endInteraction() {
   clearTimeout(holdTimer);
   holdTimer = null;
   isDragging = false;
@@ -147,7 +142,6 @@ function endInteraction(e) {
   startY = 0;
 }
 
-// ===== OPEN MENU =====
 function openMenu() {
   menu.style.display = "flex";
 
@@ -162,7 +156,7 @@ function openMenu() {
   menu.style.top = y + "px";
 }
 
-// ===== PANIC CLICK =====
+// ===== CLICK TO PANIC =====
 btn.addEventListener("click", (e) => {
   if (moved || holdActivated) return;
   window.location.href = "about:blank";
