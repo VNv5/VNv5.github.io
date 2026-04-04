@@ -1,75 +1,57 @@
-/* =========================
-   PANIC BUTTON
-========================= */
+/* ===== PANIC BUTTON ===== */
 #panic-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
 
+  /* slimmer look */
   border-radius: 50%;
-
-  /* THIN STYLE */
-  background-color: transparent;
-  border: 2px solid #e65c00;
-
+  background-color: #e65c00;
   background-image: url("/images/panicbutton.png");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 55%;
+  background-size: 60%;
 
   z-index: 9999;
   display: none;
 
   cursor: grab;
 
-  /* MOBILE FIXES */
-  touch-action: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
+  /* 🔥 MOBILE FIXES */
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 
-  /* RENDER FIX (important for mobile hitbox accuracy) */
+  touch-action: none;
+
+  /* GPU layer (fixes jank + hitbox issues) */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   will-change: transform;
 
-  /* SMOOTHNESS */
-  transition:
-    opacity 0.2s ease,
-    width 0.2s ease,
-    height 0.2s ease,
-    transform 0.15s ease;
+  /* smooth but not laggy */
+  transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
 
-  /* GLOW */
+  /* ✨ stronger glow to balance thinner button */
   box-shadow:
-    0 0 6px rgba(230,92,0,0.7),
-    0 0 16px rgba(230,92,0,0.35);
+    0 0 10px rgba(230,92,0,0.6),
+    0 0 25px rgba(230,92,0,0.35),
+    0 0 50px rgba(230,92,0,0.2);
 }
 
-/* Remove ALL mobile highlight everywhere inside button */
-#panic-btn, #panic-btn * {
-  -webkit-tap-highlight-color: transparent !important;
-  -webkit-touch-callout: none !important;
-  user-select: none !important;
-}
-
-/* Click feel */
 #panic-btn:active {
   transform: scale(1.08);
   cursor: grabbing;
 }
 
-/* =========================
-   SIZES
-========================= */
-.panic-small  { width: 45px; height: 45px; }
-.panic-medium { width: 65px; height: 65px; }
-.panic-large  { width: 90px; height: 90px; }
+/* ===== SIZE CLASSES ===== */
+.panic-small  { width: 40px; height: 40px; }
+.panic-medium { width: 58px; height: 58px; }
+.panic-large  { width: 78px; height: 78px; }
 
-/* =========================
-   MENU
-========================= */
+/* ===== MENU ===== */
 #panic-menu {
   position: fixed;
   width: 260px;
@@ -89,7 +71,11 @@
     0 0 20px rgba(230,92,0,0.5),
     0 0 40px rgba(230,92,0,0.2);
 
-  animation: panicPop 0.18s ease;
+  animation: panicPop 0.2s ease;
+
+  /* prevent weird selection on mobile */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @keyframes panicPop {
@@ -97,9 +83,7 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* =========================
-   SECTION LABELS
-========================= */
+/* ===== SECTION LABELS ===== */
 .panic-section {
   font-size: 0.78rem;
   font-weight: 600;
@@ -109,9 +93,7 @@
   margin-bottom: 6px;
 }
 
-/* =========================
-   OPTIONS
-========================= */
+/* ===== OPTION BUTTONS ===== */
 .panic-options {
   display: flex;
   gap: 6px;
@@ -133,6 +115,9 @@
   cursor: pointer;
 
   transition: all 0.2s ease;
+
+  /* mobile fix */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .panic-options button:hover {
@@ -145,13 +130,10 @@
   background: #e65c00;
   color: #fff;
   border-color: #e65c00;
-
   box-shadow: 0 0 8px rgba(230,92,0,0.6);
 }
 
-/* =========================
-   LOCK ROW
-========================= */
+/* ===== LOCK ROW ===== */
 .panic-lock {
   display: flex;
   align-items: center;
@@ -169,6 +151,8 @@
   color: #aaa;
 
   transition: all 0.2s ease;
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 .panic-lock:hover {
@@ -183,9 +167,7 @@
   color: #e65c00;
 }
 
-/* =========================
-   SLIDER
-========================= */
+/* ===== SLIDER ===== */
 .panic-slider-wrap {
   padding: 4px 0;
 }
@@ -211,7 +193,7 @@
   cursor: pointer;
 }
 
-/* Thumb */
+/* slider thumb */
 #panic-opacity::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -227,30 +209,20 @@
     0 1px 4px rgba(0,0,0,0.5);
 
   cursor: pointer;
-  transition: transform 0.15s ease;
 }
 
-#panic-opacity::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-/* Firefox */
 #panic-opacity::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border: none;
+
   border-radius: 50%;
   background: #fff;
+
+  box-shadow: 0 0 6px rgba(230,92,0,0.7);
 }
 
-#panic-opacity::-moz-range-track {
-  height: 6px;
-  border-radius: 6px;
-  background: #2a2a2a;
-}
-
-#panic-opacity::-moz-range-progress {
-  height: 6px;
-  border-radius: 6px;
-  background: #e65c00;
+/* ===== GLOBAL MOBILE FIX (kills blue highlight everywhere) ===== */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
