@@ -8,9 +8,9 @@ menu.innerHTML = `
 <div>
   <div class="panic-section">Action</div>
   <div class="panic-options">
-    <button data-action="classroom" title="Google Classroom">Class</button>
-    <button data-action="slides"    title="Google Slides">Slides</button>
-    <button data-action="docs"      title="Google Docs">Docs</button>
+    <button data-action="classroom">Class</button>
+    <button data-action="slides">Slides</button>
+    <button data-action="docs">Docs</button>
   </div>
 </div>
 
@@ -39,101 +39,92 @@ menu.innerHTML = `
 document.body.appendChild(btn);
 document.body.appendChild(menu);
 
-/* ===== SIZE MAP (px) ===== */
 const SIZE_MAP = { small: 45, medium: 65, large: 90 };
 
-/* ===== ACTION MAP ===== */
 const ACTION_MAP = {
   classroom: "https://classroom.google.com",
-  slides:    "https://docs.google.com/presentation",
-  docs:      "https://docs.google.com/document"
+  slides: "https://docs.google.com/presentation",
+  docs: "https://docs.google.com/document"
 };
 
-/* ===== LOAD SETTINGS ===== */
 function applySettings() {
   const enabled = localStorage.getItem("panicEnabled") === "true";
-  const size    = localStorage.getItem("panicSize")    || "medium";
+  const size = localStorage.getItem("panicSize") || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
-  const locked  = localStorage.getItem("panicLocked")  === "true";
-  const action  = localStorage.getItem("panicAction")  || "classroom";
-  const savedX  = localStorage.getItem("panicX");
-  const savedY  = localStorage.getItem("panicY");
+  const locked = localStorage.getItem("panicLocked") === "true";
+  const action = localStorage.getItem("panicAction") || "classroom";
+  const savedX = localStorage.getItem("panicX");
+  const savedY = localStorage.getItem("panicY");
 
   btn.style.display = enabled ? "flex" : "none";
 
-  btn.classList.remove("panic-small", "panic-medium", "panic-large");
+  btn.className = "";
+  btn.id = "panic-btn";
   btn.classList.add(`panic-${size}`);
 
-  // Also set inline so dimensions are guaranteed before first paint on mobile
   const dim = SIZE_MAP[size];
-  btn.style.width  = dim + "px";
+  btn.style.width = dim + "px";
   btn.style.height = dim + "px";
 
   btn.style.opacity = opacity / 100;
 
   if (savedX && savedY) {
-    btn.style.left   = savedX + "px";
-    btn.style.top    = savedY + "px";
-    btn.style.right  = "auto";
+    btn.style.left = savedX + "px";
+    btn.style.top = savedY + "px";
+    btn.style.right = "auto";
     btn.style.bottom = "auto";
   }
+
+  document.querySelectorAll("[data-size]").forEach(b =>
+    b.classList.toggle("active", b.dataset.size === size)
+  );
+
+  document.querySelectorAll("[data-action]").forEach(b =>
+    b.classList.toggle("active", b.dataset.action === action)
+  );
+
+  document.getElementById("lock-state").textContent = locked ? "ON" : "OFF";
 
   const opacityEl = document.getElementById("panic-opacity");
   if (opacityEl) {
     opacityEl.value = opacity;
     opacityEl.style.setProperty("--val", opacity);
   }
-
-  const lockEl = document.getElementById("lock-state");
-  if (lockEl) lockEl.textContent = locked ? "ON" : "OFF";
-
-  document.querySelectorAll("[data-size]").forEach(b => {
-    b.classList.toggle("active", b.dataset.size === size);
-  });
-
-  document.querySelectorAll("[data-action]").forEach(b => {
-    b.classList.toggle("active", b.dataset.action === action);
-  });
 }
 
-/* ===== SIZE (center-anchored) ===== */
+/* ===== SIZE FIXED ===== */
 document.addEventListener("click", (e) => {
   if (!e.target.dataset.size) return;
 
   const newSize = e.target.dataset.size;
-  const rect    = btn.getBoundingClientRect();
+  const rect = btn.getBoundingClientRect();
 
-  // Capture center before resize
-  const centerX = rect.left + rect.width  / 2;
-  const centerY = rect.top  + rect.height / 2;
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const newDim = SIZE_MAP[newSize]; // ✅ FIXED ORDER
 
   localStorage.setItem("panicSize", newSize);
 
-  // Apply class immediately
-  btn.classList.remove("panic-small", "panic-medium", "panic-large");
+  btn.className = "";
+  btn.id = "panic-btn";
   btn.classList.add(`panic-${newSize}`);
 
-  // Set inline so mobile paints correct dimensions right away
-  btn.style.width  = newDim + "px";
+  btn.style.width = newDim + "px";
   btn.style.height = newDim + "px";
 
-  // Reposition so center stays fixed
-  const newDim = SIZE_MAP[newSize];
   const newLeft = centerX - newDim / 2;
-  const newTop  = centerY - newDim / 2;
+  const newTop = centerY - newDim / 2;
 
-  btn.style.left   = newLeft + "px";
-  btn.style.top    = newTop  + "px";
-  btn.style.right  = "auto";
-  btn.style.bottom = "auto";
+  btn.style.left = newLeft + "px";
+  btn.style.top = newTop + "px";
 
   localStorage.setItem("panicX", newLeft);
   localStorage.setItem("panicY", newTop);
 
-  // Update active button highlight
-  document.querySelectorAll("[data-size]").forEach(b => {
-    b.classList.toggle("active", b.dataset.size === newSize);
-  });
+  document.querySelectorAll("[data-size]").forEach(b =>
+    b.classList.toggle("active", b.dataset.size === newSize)
+  );
 });
 
 /* ===== ACTION ===== */
@@ -141,9 +132,6 @@ document.addEventListener("click", (e) => {
   if (!e.target.dataset.action) return;
   const action = e.target.dataset.action;
   localStorage.setItem("panicAction", action);
-  document.querySelectorAll("[data-action]").forEach(b => {
-    b.classList.toggle("active", b.dataset.action === action);
-  });
 });
 
 /* ===== OPACITY ===== */
@@ -162,126 +150,65 @@ document.getElementById("panic-lock").onclick = () => {
   applySettings();
 };
 
-/* ===== DRAG SYSTEM ===== */
-let dragging  = false;
-let dragMoved = false;
-let offsetX   = 0;
-let offsetY   = 0;
-const DRAG_THRESHOLD = 6;
+/* ===== DRAG ===== */
+let dragging = false, moved = false, offsetX = 0, offsetY = 0;
 
-btn.addEventListener("mousedown",  startDrag);
+btn.addEventListener("mousedown", startDrag);
 btn.addEventListener("touchstart", startDrag, { passive: false });
 
 function startDrag(e) {
-  const locked = localStorage.getItem("panicLocked") === "true";
-  if (locked) return;
+  if (localStorage.getItem("panicLocked") === "true") return;
 
-  dragging  = true;
-  dragMoved = false;
+  dragging = true;
+  moved = false;
 
-  const rect    = btn.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const rect = btn.getBoundingClientRect();
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
 
-  offsetX = clientX - rect.left;
-  offsetY = clientY - rect.top;
+  offsetX = x - rect.left;
+  offsetY = y - rect.top;
 
   e.preventDefault();
 }
 
-document.addEventListener("mousemove",  drag);
-document.addEventListener("touchmove",  drag, { passive: false });
+document.addEventListener("mousemove", drag);
+document.addEventListener("touchmove", drag, { passive: false });
 
 function drag(e) {
   if (!dragging) return;
 
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
 
-  const newLeft = clientX - offsetX;
-  const newTop  = clientY - offsetY;
+  const left = x - offsetX;
+  const top = y - offsetY;
 
-  const dx = newLeft - (parseFloat(btn.style.left) || 0);
-  const dy = newTop  - (parseFloat(btn.style.top)  || 0);
-  if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
-    dragMoved = true;
-  }
+  if (Math.abs(left - (parseFloat(btn.style.left) || 0)) > 5) moved = true;
 
-  btn.style.left   = newLeft + "px";
-  btn.style.top    = newTop  + "px";
-  btn.style.right  = "auto";
-  btn.style.bottom = "auto";
+  btn.style.left = left + "px";
+  btn.style.top = top + "px";
 
   e.preventDefault();
 }
 
-document.addEventListener("mouseup",  stopDrag);
+document.addEventListener("mouseup", stopDrag);
 document.addEventListener("touchend", stopDrag);
 
 function stopDrag() {
-  if (dragging && dragMoved) {
+  if (dragging && moved) {
     localStorage.setItem("panicX", parseFloat(btn.style.left));
     localStorage.setItem("panicY", parseFloat(btn.style.top));
   }
   dragging = false;
 }
 
-/* ===== HOLD MENU ===== */
-let holdTimer      = null;
-let menuJustOpened = false;
-
-btn.addEventListener("touchstart", startHold, { passive: false });
-btn.addEventListener("mousedown",  startHold);
-
-function startHold() {
-  clearTimeout(holdTimer);
-  holdTimer = setTimeout(() => {
-    if (!dragMoved) {
-      menuJustOpened = true;
-      openMenu();
-    }
-  }, 600);
-}
-
-btn.addEventListener("touchend", () => clearTimeout(holdTimer));
-btn.addEventListener("mouseup",  () => clearTimeout(holdTimer));
-
-/* ===== MENU POSITION ===== */
-function openMenu() {
-  menu.style.display = "flex";
-
-  const rect = btn.getBoundingClientRect();
-  let x = rect.left;
-  let y = rect.top - 310; // taller now with action row
-
-  if (x + 260 > window.innerWidth) x = window.innerWidth - 270;
-  if (y < 0)                        y = rect.bottom + 10;
-
-  menu.style.left = x + "px";
-  menu.style.top  = y + "px";
-}
-
-/* ===== CLOSE MENU ===== */
-document.addEventListener("click", (e) => {
-  if (!menu.contains(e.target) && e.target !== btn) {
-    menu.style.display = "none";
-  }
-});
-
-/* ===== PANIC CLICK ===== */
+/* ===== CLICK ===== */
 btn.addEventListener("click", () => {
-  if (dragMoved) {
-    dragMoved = false;
-    return;
-  }
-  if (menuJustOpened) {
-    menuJustOpened = false;
-    return;
-  }
+  if (moved) { moved = false; return; }
   const action = localStorage.getItem("panicAction") || "classroom";
   window.location.href = ACTION_MAP[action];
 });
 
 /* ===== INIT ===== */
 applySettings();
-window.addEventListener("panicSettingsChanged", applySettings);
