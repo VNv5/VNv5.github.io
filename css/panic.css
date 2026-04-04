@@ -1,10 +1,14 @@
+/* ===== GLOBAL MOBILE FIX ===== */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ===== PANIC BUTTON ===== */
 #panic-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
 
-  /* slimmer look */
   border-radius: 50%;
   background-color: #e65c00;
   background-image: url("/images/panicbutton.png");
@@ -17,24 +21,18 @@
 
   cursor: grab;
 
-  /* 🔥 MOBILE FIXES */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
 
   touch-action: none;
 
-  /* GPU layer (fixes jank + hitbox issues) */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   will-change: transform;
 
-  /* smooth but not laggy */
   transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
 
-  /* ✨ stronger glow to balance thinner button */
   box-shadow:
     0 0 10px rgba(230,92,0,0.6),
     0 0 25px rgba(230,92,0,0.35),
@@ -46,7 +44,7 @@
   cursor: grabbing;
 }
 
-/* ===== SIZE CLASSES ===== */
+/* ===== SIZE ===== */
 .panic-small  { width: 40px; height: 40px; }
 .panic-medium { width: 58px; height: 58px; }
 .panic-large  { width: 78px; height: 78px; }
@@ -73,7 +71,6 @@
 
   animation: panicPop 0.2s ease;
 
-  /* prevent weird selection on mobile */
   user-select: none;
   -webkit-user-select: none;
 }
@@ -83,7 +80,7 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* ===== SECTION LABELS ===== */
+/* ===== SECTION LABEL ===== */
 .panic-section {
   font-size: 0.78rem;
   font-weight: 600;
@@ -93,7 +90,7 @@
   margin-bottom: 6px;
 }
 
-/* ===== OPTION BUTTONS ===== */
+/* ===== OPTIONS ===== */
 .panic-options {
   display: flex;
   gap: 6px;
@@ -116,24 +113,28 @@
 
   transition: all 0.2s ease;
 
-  /* mobile fix */
   -webkit-tap-highlight-color: transparent;
 }
 
+/* HOVER */
 .panic-options button:hover {
   background: #222;
   color: #fff;
   border-color: rgba(230,92,0,0.4);
 }
 
+/* 🔥 ACTIVE (FIXED — ALWAYS WINS) */
 .panic-options button.active {
-  background: #e65c00;
-  color: #fff;
-  border-color: #e65c00;
-  box-shadow: 0 0 8px rgba(230,92,0,0.6);
+  background: #e65c00 !important;
+  color: #fff !important;
+  border-color: #e65c00 !important;
+
+  box-shadow: 0 0 10px rgba(230,92,0,0.8);
+
+  transform: scale(1.05);
 }
 
-/* ===== LOCK ROW ===== */
+/* ===== LOCK ===== */
 .panic-lock {
   display: flex;
   align-items: center;
@@ -193,7 +194,6 @@
   cursor: pointer;
 }
 
-/* slider thumb */
 #panic-opacity::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -220,9 +220,4 @@
   background: #fff;
 
   box-shadow: 0 0 6px rgba(230,92,0,0.7);
-}
-
-/* ===== GLOBAL MOBILE FIX (kills blue highlight everywhere) ===== */
-* {
-  -webkit-tap-highlight-color: transparent;
 }
