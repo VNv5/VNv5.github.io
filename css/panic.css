@@ -1,195 +1,220 @@
-/* ===== PANIC BUTTON ===== */
-#panic-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  border-radius: 50%;
-  background-color: #e65c00;
-  background-image: url("/images/panicbutton.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 65%;
-  z-index: 9999;
-  display: none;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  transition: transform 0.15s ease, opacity 0.2s ease;/* ===== PANIC BUTTON ===== */
-#panic-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  border-radius: 50%;
-  background-color: #e65c00;
-  background-image: url("/images/panicbutton.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 65%;
-  z-index: 9999;
-  display: none;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  transition: transform 0.15s ease, opacity 0.2s ease;
-  box-shadow: 0 0 0 2px rgba(230,92,0,0.6), 0 0 8px rgba(230,92,0,0.4);
-}
-#panic-btn:active {
-  transform: scale(1.08);
-  cursor: grabbing;
+const btn = document.createElement("div");
+btn.id = "panic-btn";
+
+const menu = document.createElement("div");
+menu.id = "panic-menu";
+
+menu.innerHTML = `
+<div>
+  <div class="panic-section">Size</div>
+  <div class="panic-options">
+    <button data-size="small">S</button>
+    <button data-size="medium">M</button>
+    <button data-size="large">L</button>
+  </div>
+</div>
+
+<div>
+  <div class="panic-section">Transparency</div>
+  <input type="range" id="panic-opacity" min="5" max="100">
+</div>
+
+<div class="panic-lock" id="panic-lock">
+  <span>Lock Position</span>
+  <span id="lock-state">OFF</span>
+</div>
+`;
+
+document.body.appendChild(btn);
+document.body.appendChild(menu);
+
+/* ===== LOAD SETTINGS ===== */
+function applySettings() {
+  const enabled = localStorage.getItem("panicEnabled") === "true";
+  const size    = localStorage.getItem("panicSize")    || "medium";
+  const opacity = localStorage.getItem("panicOpacity") || 100;
+  const locked  = localStorage.getItem("panicLocked")  === "true";
+  const savedX  = localStorage.getItem("panicX");
+  const savedY  = localStorage.getItem("panicY");
+
+  btn.style.display = enabled ? "flex" : "none";
+
+  // Remove all size classes then apply correct one
+  btn.classList.remove("panic-small", "panic-medium", "panic-large");
+  btn.classList.add(`panic-${size}`);
+
+  btn.style.opacity = opacity / 100;
+
+  // Restore saved position
+  if (savedX && savedY) {
+    btn.style.left   = savedX + "px";
+    btn.style.top    = savedY + "px";
+    btn.style.right  = "auto";
+    btn.style.bottom = "auto";
+  }
+
+  const opacityEl = document.getElementById("panic-opacity");
+  if (opacityEl) opacityEl.value = opacity;
+
+  const lockEl = document.getElementById("lock-state");
+  if (lockEl) lockEl.textContent = locked ? "ON" : "OFF";
+
+  // Mark active size button
+  document.querySelectorAll(".panic-options button").forEach(b => {
+    b.classList.toggle("active", b.dataset.size === size);
+  });
 }
 
-/* ✅ REAL SIZE CHANGES */
-.panic-small {
-  width: 45px;
-  height: 45px;
-}
-.panic-medium {
-  width: 65px;
-  height: 65px;
-}
-.panic-large {
-  width: 90px;
-  height: 90px;
+/* ===== SIZE ===== */
+document.addEventListener("click", (e) => {
+  if (e.target.dataset.size) {
+    localStorage.setItem("panicSize", e.target.dataset.size);
+    applySettings();
+  }
+});
+
+/* ===== OPACITY ===== */
+document.addEventListener("input", (e) => {
+  if (e.target.id === "panic-opacity") {
+    localStorage.setItem("panicOpacity", e.target.value);
+    btn.style.opacity = e.target.value / 100;
+  }
+});
+
+/* ===== LOCK ===== */
+document.getElementById("panic-lock").onclick = () => {
+  const locked = localStorage.getItem("panicLocked") === "true";
+  localStorage.setItem("panicLocked", String(!locked));
+  applySettings();
+};
+
+/* ===== DRAG SYSTEM ===== */
+let dragging  = false;
+let dragMoved = false; // distance moved during THIS drag gesture
+let offsetX   = 0;
+let offsetY   = 0;
+const DRAG_THRESHOLD = 6; // px — below this we treat it as a tap/hold
+
+btn.addEventListener("mousedown",  startDrag);
+btn.addEventListener("touchstart", startDrag, { passive: false });
+
+function startDrag(e) {
+  const locked = localStorage.getItem("panicLocked") === "true";
+  if (locked) return;
+
+  dragging  = true;
+  dragMoved = false;
+
+  const rect    = btn.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+
+  e.preventDefault();
 }
 
-/* ===== MENU ===== */
-#panic-menu {
-  position: fixed;
-  width: 260px;
-  max-width: 80vw;
-  background: rgba(17,17,17,0.95);
-  border-radius: 18px;
-  padding: 18px;
-  display: none;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 10000;
-  box-shadow: 0 0 25px #e65c00, 0 0 50px rgba(230,92,0,0.6);
-  animation: panicPop 0.2s ease;
-}
-@keyframes panicPop {
-  from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: 1; transform: scale(1); }
+document.addEventListener("mousemove",  drag);
+document.addEventListener("touchmove",  drag, { passive: false });
+
+function drag(e) {
+  if (!dragging) return;
+
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  const newLeft = clientX - offsetX;
+  const newTop  = clientY - offsetY;
+
+  // Only count as a real drag once threshold is crossed
+  const dx = newLeft - (parseFloat(btn.style.left) || 0);
+  const dy = newTop  - (parseFloat(btn.style.top)  || 0);
+  if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+    dragMoved = true;
+  }
+
+  btn.style.left   = newLeft + "px";
+  btn.style.top    = newTop  + "px";
+  btn.style.right  = "auto";
+  btn.style.bottom = "auto";
+
+  e.preventDefault();
 }
 
-/* Sections */
-.panic-section {
-  font-size: 0.9rem;
-  color: #aaa;
+document.addEventListener("mouseup",  stopDrag);
+document.addEventListener("touchend", stopDrag);
+
+function stopDrag() {
+  if (dragging && dragMoved) {
+    // Persist position so it survives page reload
+    localStorage.setItem("panicX", parseFloat(btn.style.left));
+    localStorage.setItem("panicY", parseFloat(btn.style.top));
+  }
+  dragging = false;
+  // NOTE: dragMoved is intentionally NOT reset here —
+  // it's reset at the start of the NEXT mousedown/touchstart.
 }
 
-/* Buttons */
-.panic-options {
-  display: flex;
-  gap: 8px;
-}
-.panic-options button {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 10px;
-  background: #222;
-  color: #fff;
-}
-.panic-options button.active {
-  background: #e65c00;
-  box-shadow: 0 0 10px #e65c00;
+/* ===== HOLD MENU ===== */
+// We open the menu on a long-press ONLY if the pointer didn't travel
+// more than DRAG_THRESHOLD px. We check dragMoved inside the timer
+// callback using a closure reference that is always fresh.
+
+let holdTimer       = null;
+let menuJustOpened  = false; // prevents click firing right after hold releases
+
+btn.addEventListener("touchstart", startHold, { passive: false });
+btn.addEventListener("mousedown",  startHold);
+
+function startHold(e) {
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => {
+    if (!dragMoved) {
+      menuJustOpened = true;
+      openMenu();
+    }
+  }, 600);
 }
 
-/* Lock toggle */
-.panic-lock {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1a1a1a;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
+btn.addEventListener("touchend", () => clearTimeout(holdTimer));
+btn.addEventListener("mouseup",  () => clearTimeout(holdTimer));
+
+/* ===== MENU POSITION ===== */
+function openMenu() {
+  menu.style.display = "flex";
+
+  const rect = btn.getBoundingClientRect();
+  let x = rect.left;
+  let y = rect.top - 260;
+
+  if (x + 260 > window.innerWidth)  x = window.innerWidth  - 270;
+  if (y < 0)                         y = rect.bottom + 10;
+
+  menu.style.left = x + "px";
+  menu.style.top  = y + "px";
 }
 
-/* Slider */
-#panic-opacity {
-  width: 100%;
-}
-  box-shadow: 0 0 0 2px rgba(230,92,0,0.6), 0 0 8px rgba(230,92,0,0.4);
-}
-#panic-btn:active {
-  transform: scale(1.08);
-  cursor: grabbing;
-}
+/* ===== CLOSE MENU ===== */
+document.addEventListener("click", (e) => {
+  if (!menu.contains(e.target) && e.target !== btn) {
+    menu.style.display = "none";
+  }
+});
 
-/* ✅ REAL SIZE CHANGES */
-.panic-small {
-  width: 45px;
-  height: 45px;
-}
-.panic-medium {
-  width: 65px;
-  height: 65px;
-}
-.panic-large {
-  width: 90px;
-  height: 90px;
-}
+/* ===== PANIC CLICK ===== */
+btn.addEventListener("click", () => {
+  if (dragMoved) {
+    dragMoved = false;
+    return;
+  }
+  if (menuJustOpened) {
+    menuJustOpened = false;
+    return;
+  }
+  window.location.href = "about:blank";
+});
 
-/* ===== MENU ===== */
-#panic-menu {
-  position: fixed;
-  width: 260px;
-  max-width: 80vw;
-  background: rgba(17,17,17,0.95);
-  border-radius: 18px;
-  padding: 18px;
-  display: none;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 10000;
-  box-shadow: 0 0 25px #e65c00, 0 0 50px rgba(230,92,0,0.6);
-  animation: panicPop 0.2s ease;
-}
-@keyframes panicPop {
-  from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-/* Sections */
-.panic-section {
-  font-size: 0.9rem;
-  color: #aaa;
-}
-
-/* Buttons */
-.panic-options {
-  display: flex;
-  gap: 8px;
-}
-.panic-options button {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 10px;
-  background: #222;
-  color: #fff;
-}
-.panic-options button.active {
-  background: #e65c00;
-  box-shadow: 0 0 10px #e65c00;
-}
-
-/* Lock toggle */
-.panic-lock {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1a1a1a;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* Slider */
-#panic-opacity {
-  width: 100%;
-}
+/* ===== INIT ===== */
+applySettings();
+window.addEventListener("panicSettingsChanged", applySettings);
