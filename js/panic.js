@@ -1,18 +1,10 @@
-// ===== CREATE BUTTON & MENU =====
 const btn = document.createElement("div");
 btn.id = "panic-btn";
-const img = document.createElement("img");
-img.src = "/images/panicbutton.png";
-btn.appendChild(img);
 
 const menu = document.createElement("div");
 menu.id = "panic-menu";
-menu.innerHTML = `
-<div id="panic-menu-header">
-  <span>Panic Settings</span>
-  <button id="panic-close">X</button>
-</div>
 
+menu.innerHTML = `
 <div>
   <div class="panic-section">Size</div>
   <div class="panic-options">
@@ -36,141 +28,185 @@ menu.innerHTML = `
 document.body.appendChild(btn);
 document.body.appendChild(menu);
 
-// ===== SETTINGS =====
+/* ===== LOAD SETTINGS ===== */
 function applySettings() {
   const enabled = localStorage.getItem("panicEnabled") === "true";
-  const size = localStorage.getItem("panicSize") || "medium";
+  const size    = localStorage.getItem("panicSize")    || "medium";
   const opacity = localStorage.getItem("panicOpacity") || 100;
-  const locked = localStorage.getItem("panicLocked") === "true";
+  const locked  = localStorage.getItem("panicLocked")  === "true";
+  const savedX  = localStorage.getItem("panicX");
+  const savedY  = localStorage.getItem("panicY");
 
   btn.style.display = enabled ? "flex" : "none";
-  btn.className = `panic-${size}`;
-  btn.style.opacity = opacity / 100;
-  document.getElementById("panic-opacity").value = opacity;
-  document.getElementById("lock-state").textContent = locked ? "ON" : "OFF";
 
-  document.querySelectorAll("[data-size]").forEach(b => {
+  // Remove all size classes then apply correct one
+  btn.classList.remove("panic-small", "panic-medium", "panic-large");
+  btn.classList.add(`panic-${size}`);
+
+  btn.style.opacity = opacity / 100;
+
+  // Restore saved position
+  if (savedX && savedY) {
+    btn.style.left   = savedX + "px";
+    btn.style.top    = savedY + "px";
+    btn.style.right  = "auto";
+    btn.style.bottom = "auto";
+  }
+
+  const opacityEl = document.getElementById("panic-opacity");
+  if (opacityEl) opacityEl.value = opacity;
+
+  const lockEl = document.getElementById("lock-state");
+  if (lockEl) lockEl.textContent = locked ? "ON" : "OFF";
+
+  // Mark active size button
+  document.querySelectorAll(".panic-options button").forEach(b => {
     b.classList.toggle("active", b.dataset.size === size);
   });
 }
 
-// ===== MENU INTERACTIONS =====
-document.addEventListener("click", e => {
+/* ===== SIZE ===== */
+document.addEventListener("click", (e) => {
   if (e.target.dataset.size) {
     localStorage.setItem("panicSize", e.target.dataset.size);
     applySettings();
   }
 });
 
-document.addEventListener("input", e => {
+/* ===== OPACITY ===== */
+document.addEventListener("input", (e) => {
   if (e.target.id === "panic-opacity") {
     localStorage.setItem("panicOpacity", e.target.value);
     btn.style.opacity = e.target.value / 100;
   }
 });
 
+/* ===== LOCK ===== */
 document.getElementById("panic-lock").onclick = () => {
   const locked = localStorage.getItem("panicLocked") === "true";
-  localStorage.setItem("panicLocked", !locked);
+  localStorage.setItem("panicLocked", String(!locked));
   applySettings();
 };
 
-document.getElementById("panic-close").onclick = () => menu.style.display = "none";
+/* ===== DRAG SYSTEM ===== */
+let dragging  = false;
+let dragMoved = false; // distance moved during THIS drag gesture
+let offsetX   = 0;
+let offsetY   = 0;
+const DRAG_THRESHOLD = 6; // px — below this we treat it as a tap/hold
 
-// ===== DRAG + LONG-PRESS =====
-let isDragging = false;
-let startX = 0, startY = 0;
-let offsetX = 0, offsetY = 0;
-let moved = false;
-let holdTimer = null;
-let holdActivated = false;
+btn.addEventListener("mousedown",  startDrag);
+btn.addEventListener("touchstart", startDrag, { passive: false });
 
-function startInteraction(e) {
+function startDrag(e) {
   const locked = localStorage.getItem("panicLocked") === "true";
-  moved = false;
-  holdActivated = false;
+  if (locked) return;
 
-  const rect = btn.getBoundingClientRect();
+  dragging  = true;
+  dragMoved = false;
+
+  const rect    = btn.getBoundingClientRect();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  startX = clientX;
-  startY = clientY;
   offsetX = clientX - rect.left;
   offsetY = clientY - rect.top;
 
-  holdTimer = setTimeout(() => {
-    if (!moved) {
-      openMenu();
-      holdActivated = true;
-    }
-  }, 700);
-
   e.preventDefault();
 }
 
-function moveInteraction(e) {
-  const locked = localStorage.getItem("panicLocked") === "true";
+document.addEventListener("mousemove",  drag);
+document.addEventListener("touchmove",  drag, { passive: false });
+
+function drag(e) {
+  if (!dragging) return;
+
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  const dx = Math.abs(clientX - startX);
-  const dy = Math.abs(clientY - startY);
+  const newLeft = clientX - offsetX;
+  const newTop  = clientY - offsetY;
 
-  if (!locked && (dx > 5 || dy > 5)) {
-    isDragging = true;
-    moved = true;
-    clearTimeout(holdTimer);
-    holdTimer = null;
-
-    const x = clientX - offsetX;
-    const y = clientY - offsetY;
-
-    btn.style.left = x + "px";
-    btn.style.top = y + "px";
-    btn.style.right = "auto";
-    btn.style.bottom = "auto";
+  // Only count as a real drag once threshold is crossed
+  const dx = newLeft - (parseFloat(btn.style.left) || 0);
+  const dy = newTop  - (parseFloat(btn.style.top)  || 0);
+  if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+    dragMoved = true;
   }
+
+  btn.style.left   = newLeft + "px";
+  btn.style.top    = newTop  + "px";
+  btn.style.right  = "auto";
+  btn.style.bottom = "auto";
+
   e.preventDefault();
 }
 
-function endInteraction() {
-  clearTimeout(holdTimer);
-  holdTimer = null;
-  isDragging = false;
-  startX = 0;
-  startY = 0;
+document.addEventListener("mouseup",  stopDrag);
+document.addEventListener("touchend", stopDrag);
+
+function stopDrag() {
+  if (dragging && dragMoved) {
+    // Persist position so it survives page reload
+    localStorage.setItem("panicX", parseFloat(btn.style.left));
+    localStorage.setItem("panicY", parseFloat(btn.style.top));
+  }
+  dragging = false;
+  // NOTE: dragMoved is intentionally NOT reset here —
+  // it's reset at the start of the NEXT mousedown/touchstart.
 }
 
+/* ===== HOLD MENU ===== */
+// We open the menu on a long-press ONLY if the pointer didn't travel
+// more than DRAG_THRESHOLD px. We check dragMoved inside the timer
+// callback using a closure reference that is always fresh.
+
+let holdTimer = null;
+
+btn.addEventListener("touchstart", startHold, { passive: false });
+btn.addEventListener("mousedown",  startHold);
+
+function startHold(e) {
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => {
+    // At fire time, if dragMoved is still false, the user held without dragging
+    if (!dragMoved) openMenu();
+  }, 600); // 600 ms feels natural; original 1500 ms was too long
+}
+
+btn.addEventListener("touchend", () => clearTimeout(holdTimer));
+btn.addEventListener("mouseup",  () => clearTimeout(holdTimer));
+
+/* ===== MENU POSITION ===== */
 function openMenu() {
   menu.style.display = "flex";
 
   const rect = btn.getBoundingClientRect();
   let x = rect.left;
-  let y = rect.top - menu.offsetHeight - 10;
+  let y = rect.top - 260;
 
-  if (x + menu.offsetWidth > window.innerWidth) x = window.innerWidth - menu.offsetWidth - 10;
-  if (y < 0) y = rect.bottom + 10;
+  if (x + 260 > window.innerWidth)  x = window.innerWidth  - 270;
+  if (y < 0)                         y = rect.bottom + 10;
 
   menu.style.left = x + "px";
-  menu.style.top = y + "px";
+  menu.style.top  = y + "px";
 }
 
-// ===== CLICK TO PANIC =====
-btn.addEventListener("click", (e) => {
-  if (moved || holdActivated) return;
+/* ===== CLOSE MENU ===== */
+document.addEventListener("click", (e) => {
+  if (!menu.contains(e.target) && e.target !== btn) {
+    menu.style.display = "none";
+  }
+});
+
+/* ===== PANIC CLICK ===== */
+btn.addEventListener("click", () => {
+  if (dragMoved) {
+    dragMoved = false; // reset so next tap works
+    return;
+  }
   window.location.href = "about:blank";
 });
 
-// ===== EVENTS =====
-btn.addEventListener("mousedown", startInteraction);
-btn.addEventListener("touchstart", startInteraction, { passive: false });
-
-document.addEventListener("mousemove", moveInteraction);
-document.addEventListener("touchmove", moveInteraction, { passive: false });
-
-document.addEventListener("mouseup", endInteraction);
-document.addEventListener("touchend", endInteraction);
-
-// ===== INIT =====
+/* ===== INIT ===== */
 applySettings();
