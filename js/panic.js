@@ -161,7 +161,8 @@ function stopDrag() {
 // more than DRAG_THRESHOLD px. We check dragMoved inside the timer
 // callback using a closure reference that is always fresh.
 
-let holdTimer = null;
+let holdTimer       = null;
+let menuJustOpened  = false; // prevents click firing right after hold releases
 
 btn.addEventListener("touchstart", startHold, { passive: false });
 btn.addEventListener("mousedown",  startHold);
@@ -169,9 +170,11 @@ btn.addEventListener("mousedown",  startHold);
 function startHold(e) {
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
-    // At fire time, if dragMoved is still false, the user held without dragging
-    if (!dragMoved) openMenu();
-  }, 600); // 600 ms feels natural; original 1500 ms was too long
+    if (!dragMoved) {
+      menuJustOpened = true;
+      openMenu();
+    }
+  }, 600);
 }
 
 btn.addEventListener("touchend", () => clearTimeout(holdTimer));
@@ -202,7 +205,11 @@ document.addEventListener("click", (e) => {
 /* ===== PANIC CLICK ===== */
 btn.addEventListener("click", () => {
   if (dragMoved) {
-    dragMoved = false; // reset so next tap works
+    dragMoved = false;
+    return;
+  }
+  if (menuJustOpened) {
+    menuJustOpened = false;
     return;
   }
   window.location.href = "about:blank";
@@ -210,3 +217,4 @@ btn.addEventListener("click", () => {
 
 /* ===== INIT ===== */
 applySettings();
+window.addEventListener("panicSettingsChanged", applySettings);
