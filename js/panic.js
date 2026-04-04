@@ -64,6 +64,11 @@ function applySettings() {
   btn.classList.remove("panic-small", "panic-medium", "panic-large");
   btn.classList.add(`panic-${size}`);
 
+  // Also set inline so dimensions are guaranteed before first paint on mobile
+  const dim = SIZE_MAP[size];
+  btn.style.width  = dim + "px";
+  btn.style.height = dim + "px";
+
   btn.style.opacity = opacity / 100;
 
   if (savedX && savedY) {
@@ -107,6 +112,10 @@ document.addEventListener("click", (e) => {
   // Apply class immediately
   btn.classList.remove("panic-small", "panic-medium", "panic-large");
   btn.classList.add(`panic-${newSize}`);
+
+  // Set inline so mobile paints correct dimensions right away
+  btn.style.width  = newDim + "px";
+  btn.style.height = newDim + "px";
 
   // Reposition so center stays fixed
   const newDim = SIZE_MAP[newSize];
