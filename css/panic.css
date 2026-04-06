@@ -22,7 +22,7 @@
   will-change: transform;
   transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
   /* Subtle glow only — no ring */
-  box-shadow: 0 0 8px rgba(230,92,0,0.35);
+  box-shadow: 0 0 0 1.5px rgba(230,92,0,0.45), 0 0 6px rgba(230,92,0,0.2);
 }
 
 #panic-btn:active {
