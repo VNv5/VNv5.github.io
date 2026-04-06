@@ -117,10 +117,13 @@ function openCloak() {
 
 /* ===== AUTO CLOAK ===== */
 function maybeAutoCloak() {
+  // Never run inside an iframe — prevents infinite loop when the cloaked
+  // window loads vnv5.github.io and main.js fires again inside the iframe
+  if (window !== window.top) return;
+
   if (localStorage.getItem("autoCloak") !== "true") return;
 
   if (detectWebAppMode()) {
-    // Don't show overlay in web-app mode — just silently skip
     return;
   }
 
