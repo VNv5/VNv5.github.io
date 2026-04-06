@@ -42,7 +42,8 @@ function detectWebAppMode() {
 function openCloak() {
   var win = window.open("", "_blank");
   if (!win) {
-    window.location.href = "https://vnv5.github.io";
+    // Popup blocked — redirect current tab instead
+    window.location.replace("https://google.com");
     return;
   }
   var iframe = win.document.createElement("iframe");
@@ -52,14 +53,59 @@ function openCloak() {
   win.document.body.style.height = "100vh";
   win.document.body.appendChild(iframe);
   win.document.title = "Google Docs";
+
+  // Redirect original tab to Google so it doesn't sit on the site
+  window.location.replace("https://google.com");
 }
 
-// Auto cloak: if enabled, cloak the moment the page loads
+// Auto cloak: window.open() is blocked by browsers on page load without
+// a user gesture. Fix: show a fake "loading" overlay immediately —
+// when the user taps it (counts as a gesture) the cloak fires.
 function maybeAutoCloak() {
-  if (localStorage.getItem("autoCloak") === "true") openCloak();
+  if (localStorage.getItem("autoCloak") !== "true") return;
+
+  // Build overlay
+  const overlay = document.createElement("div");
+  overlay.id = "cloak-overlay";
+  overlay.style.cssText = [
+    "position:fixed",
+    "inset:0",
+    "background:#fff",
+    "z-index:99999",
+    "display:flex",
+    "flex-direction:column",
+    "justify-content:center",
+    "align-items:center",
+    "cursor:pointer",
+    "font-family:arial,sans-serif",
+    "color:#444",
+    "user-select:none",
+    "-webkit-user-select:none"
+  ].join(";");
+
+  // Looks like a generic Google loading screen
+  overlay.innerHTML = `
+    <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+         style="width:180px;margin-bottom:32px;opacity:0.9">
+    <div style="width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid #4285f4;
+                border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Any interaction triggers the cloak
+  function triggerCloak() {
+    overlay.removeEventListener("click",      triggerCloak);
+    overlay.removeEventListener("touchstart", triggerCloak);
+    openCloak();
+  }
+
+  overlay.addEventListener("click",      triggerCloak);
+  overlay.addEventListener("touchstart", triggerCloak, { passive: true });
 }
 
-// Expose globally so settings page button can call it directly
+// Expose globally so settings page inline onclick can call it
 window.openCloak = openCloak;
 
 /* ===== PANIC BUTTON LOADER ===== */
