@@ -24,8 +24,8 @@
 
     <div class="game-player">
 
-      <div class="game-frame">
-        <iframe id="gameFrame" src="https://frogiesarcade.win"></iframe>
+      <div class="game-frame" id="gameFrameWrap">
+        <iframe id="gameFrame" src="https://example.com"></iframe>
       </div>
 
       <div class="game-controls">
@@ -49,6 +49,9 @@
   <p>&copy; 2026 The Carey Network</p>
 </footer>
 
+<!-- FULLSCREEN EXIT BUTTON -->
+<button id="exitFullscreenBtn" onclick="exitFullscreenMode()">✕</button>
+
 <script src="/js/main.js"></script>
 
 <script>
@@ -57,22 +60,27 @@ function refreshGame() {
   frame.src = frame.src;
 }
 
+function isWebApp() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
 function toggleFullscreen() {
-  const frameWrap = document.querySelector(".game-frame");
+  const wrap = document.getElementById("gameFrameWrap");
 
-  const isWebApp =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
-
-  if (isWebApp) {
-    document.body.classList.toggle("embed-fullscreen");
+  if (isWebApp()) {
+    document.body.classList.add("embed-fullscreen");
   } else {
     if (!document.fullscreenElement) {
-      frameWrap.requestFullscreen();
+      wrap.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
   }
+}
+
+function exitFullscreenMode() {
+  document.body.classList.remove("embed-fullscreen");
 }
 </script>
 
