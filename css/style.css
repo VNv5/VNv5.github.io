@@ -398,7 +398,7 @@ body.fade-out .games-overlay {
 @media (max-width: 400px) {
   .games-grid { grid-template-columns: repeat(2, 1fr); }
 }
-/* ---- Game Player ---- */
+/* ===== GAME PLAYER ===== */
 .game-player {
   width: 100%;
   max-width: 1200px;
@@ -420,6 +420,7 @@ body.fade-out .games-overlay {
   border: none;
 }
 
+/* CONTROLS */
 .game-controls {
   margin-top: 12px;
   display: flex;
@@ -451,25 +452,60 @@ body.fade-out .games-overlay {
   height: 24px;
 }
 
-/* ---- Web App Fullscreen Mode ---- */
-.embed-fullscreen .game-frame {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: unset;
-  z-index: 99998;
-  border-radius: 0;
+/* ===== REAL FULLSCREEN MODE ===== */
+.embed-fullscreen {
+  overflow: hidden;
 }
 
-/* Exit Button */
-.embed-fullscreen::before {
-  content: "✕";
+/* iframe takes full screen */
+.embed-fullscreen #gameFrame {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99998;
+  background: #000;
+}
+
+/* remove frame styling */
+.embed-fullscreen .game-frame {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* hide everything except iframe */
+.embed-fullscreen header,
+.embed-fullscreen footer,
+.embed-fullscreen .game-controls,
+.embed-fullscreen .games-overlay,
+.embed-fullscreen .hero > *:not(.game-player) {
+  display: none !important;
+}
+
+/* EXIT BUTTON */
+#exitFullscreenBtn {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 99999;
-  font-size: 2rem;
+  top: 16px;
+  left: 16px;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(0,0,0,0.7);
   color: #fff;
+  font-size: 1.6rem;
   cursor: pointer;
+  z-index: 99999;
+  display: none;
+  backdrop-filter: blur(8px);
+}
+
+.embed-fullscreen #exitFullscreenBtn {
+  display: block;
+}
+
+#exitFullscreenBtn:hover {
+  background: rgba(230,92,0,0.9);
 }
