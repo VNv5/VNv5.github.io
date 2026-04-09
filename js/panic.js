@@ -5,6 +5,8 @@ const menu = document.createElement("div");
 menu.id = "panic-menu";
 
 menu.innerHTML = `
+<div id="panic-close-btn">✕</div> <!-- ✅ ADDED -->
+
 <div>
   <div class="panic-section">Action</div>
   <div class="panic-options">
@@ -38,6 +40,13 @@ menu.innerHTML = `
 
 document.body.appendChild(btn);
 document.body.appendChild(menu);
+
+/* ===== CLOSE BUTTON LOGIC (ADDED) ===== */
+document.addEventListener("click", (e) => {
+  if (e.target.id === "panic-close-btn") {
+    menu.style.display = "none";
+  }
+});
 
 /* ===== CONSTANTS ===== */
 const SIZE_MAP = { small: 45, medium: 65, large: 90 };
@@ -107,18 +116,15 @@ menu.addEventListener("click", (e) => {
   if (!sizeBtn) return;
 
   const newSize = sizeBtn.dataset.size;
-  const newDim  = SIZE_MAP[newSize]; // declared BEFORE use
+  const newDim  = SIZE_MAP[newSize];
 
-  // Capture center of button before resize
   const rect    = btn.getBoundingClientRect();
   const centerX = rect.left + rect.width  / 2;
   const centerY = rect.top  + rect.height / 2;
 
-  // Apply new size inline immediately
   btn.style.width  = newDim + "px";
   btn.style.height = newDim + "px";
 
-  // Reposition so it grows/shrinks from center
   const newLeft = centerX - newDim / 2;
   const newTop  = centerY - newDim / 2;
 
@@ -250,7 +256,7 @@ function onHoldEnd() {
 /* ===== MENU OPEN/CLOSE ===== */
 function openMenu() {
   menu.style.display = "flex";
-  applySettings(); // refresh active states every open
+  applySettings();
 
   const rect = btn.getBoundingClientRect();
   let x = rect.left;
@@ -269,25 +275,20 @@ document.addEventListener("click", (e) => {
   }
 });
 
-/* ===== PANIC TAP — use touchend/mouseup instead of click ===== */
-// This avoids Safari's synthetic click coordinate offset on fixed elements.
+/* ===== PANIC TAP ===== */
 btn.addEventListener("touchend", onBtnTap);
 btn.addEventListener("mouseup",  onBtnTap);
 
 function onBtnTap(e) {
-  // Only fire if this was a clean tap (no drag, no hold menu)
   if (dragging)       return;
   if (dragMoved)      { dragMoved = false; return; }
   if (menuJustOpened) { menuJustOpened = false; return; }
 
-  // Ignore if the hold timer hasn't fired yet (it's a quick tap, not hold)
-  // Let the timer cancel naturally on touchend via onHoldEnd
   e.preventDefault();
   const action = localStorage.getItem("panicAction") || "classroom";
   window.location.href = ACTION_MAP[action];
 }
 
-/* ===== EXPOSE CLOAK GLOBALLY ===== */
 /* ===== INIT ===== */
 applySettings();
 window.addEventListener("panicSettingsChanged", applySettings);
