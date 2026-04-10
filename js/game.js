@@ -11,18 +11,17 @@ function isWebApp() {
 }
 
 function toggleFullscreen() {
-  if (isWebApp()) {
-    const entering = !document.body.classList.contains("embed-fullscreen");
-    document.body.classList.toggle("embed-fullscreen");
-    exitBtn.style.display = entering ? "block" : "none";
+  const el = document.documentElement;
+
+  if (!document.fullscreenElement) {
+    el.requestFullscreen?.();
+    document.body.classList.add("embed-fullscreen");
+    exitBtn.style.display = "block";
   } else {
-    if (!document.fullscreenElement) {
-      player.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
+    document.exitFullscreen?.();
+    document.body.classList.remove("embed-fullscreen");
+    exitBtn.style.display = "none";
   }
-  document.activeElement.blur();
 }
 
 function exitFullscreenMode() {
