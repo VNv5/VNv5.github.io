@@ -458,7 +458,7 @@ body.fade-out .games-overlay {
   height: 24px;
 }
 
-/* ===== WEBAPP FULLSCREEN MODE (FIXED) ===== */
+/* ===== WEBAPP FULLSCREEN MODE (STABLE FIX) ===== */
 .embed-fullscreen {
   position: fixed;
   inset: 0;
@@ -468,17 +468,22 @@ body.fade-out .games-overlay {
   background: #000;
 }
 
-/* keep SAME structure instead of detaching iframe */
+/* make the game container the root fullscreen layer */
 .embed-fullscreen .game-player {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   background: #000;
+  z-index: 1;
 }
 
-/* force frame system to fill properly */
-.embed-fullscreen .game-frame,
+/* proper sizing chain */
+.embed-fullscreen .game-frame {
+  width: 100%;
+  height: 100%;
+}
+
 .embed-fullscreen iframe {
   width: 100%;
   height: 100%;
@@ -487,16 +492,21 @@ body.fade-out .games-overlay {
   display: block;
 }
 
-/* hide UI */
+/* hide UI safely */
 .embed-fullscreen header,
 .embed-fullscreen footer,
-.embed-fullscreen .game-controls,
-.embed-fullscreen .utility-bar,
 .embed-fullscreen #nav-container {
   display: none !important;
 }
 
-/* exit button */
+.embed-fullscreen .game-controls,
+.embed-fullscreen .utility-bar {
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* exit button stays above everything */
 .embed-fullscreen #exitFullscreenBtn {
   display: block;
   z-index: 99999;
