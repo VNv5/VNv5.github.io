@@ -133,11 +133,17 @@ function closeDeletePopup() {
 function confirmDelete() {
   closeDeletePopup();
 
-  // wipe all browser storage (works for most HTML games)
   try {
-    localStorage.clear();
-    sessionStorage.clear();
+    const win = frame.contentWindow;
+
+    // wipe EVERYTHING in that iframe only
+    win.localStorage.clear();
+    win.sessionStorage.clear();
   } catch (e) {}
+
+  // reload game
+  frame.src = frame.src;
+}
 
   // reload game
   frame.src = frame.src;
