@@ -10,14 +10,11 @@ function isWebApp() {
   return window.navigator.standalone === true;
 }
 
-function isFullscreen() {
-  return document.body.classList.contains("embed-fullscreen");
-}
-
 function toggleFullscreen() {
   if (isWebApp()) {
+    const entering = !document.body.classList.contains("embed-fullscreen");
     document.body.classList.toggle("embed-fullscreen");
-    exitBtn.style.display = isFullscreen() ? "block" : "none";
+    exitBtn.style.display = entering ? "block" : "none";
   } else {
     if (!document.fullscreenElement) {
       player.requestFullscreen();
@@ -27,15 +24,6 @@ function toggleFullscreen() {
   }
   document.activeElement.blur();
 }
-
-// Sync CSS class with browser fullscreen state
-document.addEventListener("fullscreenchange", () => {
-  if (document.fullscreenElement) {
-    player.classList.add("player-fullscreen");
-  } else {
-    player.classList.remove("player-fullscreen");
-  }
-});
 
 function exitFullscreenMode() {
   document.body.classList.remove("embed-fullscreen");
