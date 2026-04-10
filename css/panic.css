@@ -43,6 +43,7 @@
   background: rgba(17,17,17,0.97);
   border-radius: 18px;
   padding: 18px;
+  padding-top: 32px; /* <-- ADD THIS HERE */
   display: none;
   flex-direction: column;
   gap: 14px;
