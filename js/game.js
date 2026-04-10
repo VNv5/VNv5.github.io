@@ -1,13 +1,13 @@
 const frame = document.getElementById("gameFrame");
 const exitBtn = document.getElementById("exitFullscreenBtn");
+const player = document.querySelector(".game-player");
 
 function refreshGame() {
   frame.src = frame.src;
 }
 
 function isWebApp() {
-  return window.matchMedia("(display-mode: standalone)").matches
-      || window.navigator.standalone === true;
+  return window.navigator.standalone === true;
 }
 
 function isFullscreen() {
@@ -15,25 +15,27 @@ function isFullscreen() {
 }
 
 function toggleFullscreen() {
-  alert(
-    "isWebApp: " + isWebApp() +
-    "\nstandalone: " + window.navigator.standalone +
-    "\nmatchMedia: " + window.matchMedia("(display-mode: standalone)").matches
-  );
-
   if (isWebApp()) {
     document.body.classList.toggle("embed-fullscreen");
     exitBtn.style.display = isFullscreen() ? "block" : "none";
   } else {
     if (!document.fullscreenElement) {
-      document.querySelector(".game-player").requestFullscreen();
+      player.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
   }
-
   document.activeElement.blur();
 }
+
+// Sync CSS class with browser fullscreen state
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) {
+    player.classList.add("player-fullscreen");
+  } else {
+    player.classList.remove("player-fullscreen");
+  }
+});
 
 function exitFullscreenMode() {
   document.body.classList.remove("embed-fullscreen");
@@ -63,7 +65,3 @@ function confirmDelete() {
     frame.src = frame.getAttribute("data-src");
   }, 300);
 }
-
-console.log("isWebApp:", isWebApp());
-console.log("standalone:", window.navigator.standalone);
-console.log("matchMedia:", window.matchMedia("(display-mode: standalone)").matches);
