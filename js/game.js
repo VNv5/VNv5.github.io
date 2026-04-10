@@ -11,23 +11,36 @@ function isWebApp() {
 }
 
 function toggleFullscreen() {
-  const isNative = document.fullscreenElement;
+  const isCustom = document.body.classList.contains("embed-fullscreen");
 
-  // If browser fullscreen is active, exit it first
-  if (isNative) {
+  // If already in browser fullscreen → exit it
+  if (document.fullscreenElement) {
     document.exitFullscreen?.();
+    return;
   }
 
-  // toggle custom fullscreen ONLY
-  document.body.classList.toggle("embed-fullscreen");
+  // If NOT in browser fullscreen, enter it first
+  const el = document.documentElement;
 
-  exitBtn.style.display =
-    document.body.classList.contains("embed-fullscreen") ? "block" : "none";
+  if (el.requestFullscreen) {
+    el.requestFullscreen().catch(() => {
+      // fallback if blocked → use custom fullscreen
+      document.body.classList.toggle("embed-fullscreen");
+    });
+  } else {
+    // fallback for iOS / unsupported browsers
+    document.body.classList.toggle("embed-fullscreen");
+  }
 
+  exitBtn.style.display = "block";
   document.activeElement.blur();
 }
 
 function exitFullscreenMode() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen?.();
+  }
+
   document.body.classList.remove("embed-fullscreen");
   exitBtn.style.display = "none";
 }
