@@ -51,25 +51,21 @@
   animation: panicPop 0.2s ease;
 }
 
-@keyframes panicPop {
-  from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: 1; transform: scale(1); }
+/* minegyat */
+#panic-close-btn {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #fff;
+  opacity: 0.7;
+  transition: 0.2s;
 }
 
-/* Section labels */
-.panic-section {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-/* Option button rows */
-.panic-options {
-  display: flex;
-  gap: 6px;
+#panic-close-btn:hover {
+  opacity: 1;
+  color: #e65c00;
 }
 
 .panic-options button {
