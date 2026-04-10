@@ -458,58 +458,71 @@ body.fade-out .games-overlay {
   height: 24px;
 }
 
-/* ===== WEBAPP FULLSCREEN MODE (STABLE FIX) ===== */
+/* ===== REAL FULLSCREEN MODE (FIXED + STABLE) ===== */
+
 .embed-fullscreen {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  z-index: 99997;
   background: #000;
 }
 
-/* make the game container the root fullscreen layer */
-.embed-fullscreen .game-player {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+/* iframe stays fullscreen WITHOUT dvh (fixes iPad issues) */
+.embed-fullscreen #gameFrame {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 99998;
   background: #000;
-  z-index: 1;
 }
 
-/* proper sizing chain */
+/* remove frame styling */
 .embed-fullscreen .game-frame {
-  width: 100%;
-  height: 100%;
-}
-
-.embed-fullscreen iframe {
-  width: 100%;
-  height: 100%;
   border: none !important;
-  border-radius: 0 !important;
-  display: block;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
-/* hide UI safely */
+/* HIDE EVERYTHING ELSE */
 .embed-fullscreen header,
 .embed-fullscreen footer,
+.embed-fullscreen .game-controls,
+.embed-fullscreen .games-overlay,
+.embed-fullscreen .hero > *:not(.game-player),
+.embed-fullscreen .utility-bar,
 .embed-fullscreen #nav-container {
   display: none !important;
 }
 
-.embed-fullscreen .game-controls,
-.embed-fullscreen .utility-bar {
-  position: relative;
-  z-index: 0;
-  pointer-events: none;
+/* EXIT BUTTON */
+#exitFullscreenBtn {
+  position: fixed;
+  top: env(safe-area-inset-top, 16px);
+  left: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: none;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 1.6rem;
+  cursor: pointer;
+  z-index: 99999;
+  display: none;
+  backdrop-filter: blur(10px);
 }
 
-/* exit button stays above everything */
 .embed-fullscreen #exitFullscreenBtn {
   display: block;
-  z-index: 99999;
+}
+
+#exitFullscreenBtn:hover {
+  background: rgba(230,92,0,0.9);
 }
 
 /* ===== BASE PLAYER LAYOUT ===== */
