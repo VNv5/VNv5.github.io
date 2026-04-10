@@ -56,3 +56,7 @@ function confirmDelete() {
     frame.src = frame.getAttribute("data-src");
   }, 300);
 }
+
+console.log("isWebApp:", isWebApp());
+console.log("standalone:", window.navigator.standalone);
+console.log("matchMedia:", window.matchMedia("(display-mode: standalone)").matches);
