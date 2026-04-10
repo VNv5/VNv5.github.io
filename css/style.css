@@ -31,7 +31,6 @@ header, main, footer {
   transform: translateY(8px) scale(0.985);
   filter: blur(1.5px);
   transition: opacity 0.35s ease-out, transform 0.35s ease-out, filter 0.35s ease-out;
-  will-change: transform, opacity;
 }
 
 body.fade-in header,
@@ -453,55 +452,48 @@ body.fade-out .games-overlay {
   height: 24px;
 }
 
-/* ===== WEBAPP FULLSCREEN (STABLE ORIGINAL LOGIC RESTORED) ===== */
+/* ===== REAL FULLSCREEN MODE (FIXED FOR iOS + UTILITY BAR) ===== */
+
 .embed-fullscreen {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100dvh;
+  height: 100dvh; /* iOS FIX */
   overflow: hidden;
-  background: #000;
   z-index: 99997;
+  background: #000;
 }
 
-/* kill layout constraints */
-.embed-fullscreen .game-player {
-  max-width: none !important;
-  width: 100vw;
-  height: 100dvh;
-  margin: 0 !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* iframe */
+/* iframe takes FULL screen */
 .embed-fullscreen #gameFrame {
-  position: fixed;
-  inset: 0;
+  position: fixed !important;
+  top: 0;
+  left: 0;
   width: 100vw !important;
-  height: 100dvh !important;
+  height: 100dvh !important; /* iOS FIX */
+  z-index: 99998;
+  background: #000;
 }
 
-/* hide UI */
+/* remove frame styling */
+.embed-fullscreen .game-frame {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* HIDE EVERYTHING ELSE */
 .embed-fullscreen header,
 .embed-fullscreen footer,
 .embed-fullscreen .game-controls,
 .embed-fullscreen .games-overlay,
+.embed-fullscreen .hero > *:not(.game-player),
 .embed-fullscreen .utility-bar,
 .embed-fullscreen #nav-container {
   display: none !important;
 }
 
-/* frame reset */
-.embed-fullscreen .game-frame {
-  border: none !important;
-  box-shadow: none !important;
-  width: 100vw;
-  height: 100dvh;
-}
-
-/* exit button (ONLY ONE RULE) */
+/* EXIT BUTTON */
 #exitFullscreenBtn {
   position: fixed;
   top: env(safe-area-inset-top, 16px);
@@ -516,69 +508,41 @@ body.fade-out .games-overlay {
   cursor: pointer;
   z-index: 99999;
   display: none;
+  backdrop-filter: blur(10px);
 }
 
 .embed-fullscreen #exitFullscreenBtn {
   display: block;
 }
 
-/* ===== BASE PLAYER LAYOUT ===== */
-.game-player {
-  width: 100%;
-  height: 100%;
+#exitFullscreenBtn:hover {
+  background: rgba(230,92,0,0.9);
 }
 
-.game-frame {
-  width: 100%;
-  height: 100%;
+.player-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: unset !important;
+  background: #000 !important;
+  z-index: 99998;
+  display: flex !important;
 }
 
-.game-player iframe {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border: none;
-}
-
-/* ===== BROWSER FULLSCREEN ===== */
-.game-player:fullscreen,
-.game-player:-webkit-full-screen {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  display: block;
-  max-width: unset;
-  padding: 0;
-}
-
-.game-player:fullscreen .game-frame,
-.game-player:-webkit-full-screen .game-frame {
-  width: 100%;
-  height: 100%;
+.player-fullscreen .game-frame {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   aspect-ratio: unset !important;
 }
 
-.game-player:fullscreen iframe,
-.game-player:-webkit-full-screen iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.game-player:fullscreen .game-controls,
-.game-player:-webkit-full-screen .game-controls {
-  display: none;
-}
-
-#nav-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100000;
+.player-fullscreen iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
 }
