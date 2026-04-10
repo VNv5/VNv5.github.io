@@ -100,8 +100,9 @@ function toggleFullscreen() {
   if (isWebApp()) {
     document.body.classList.toggle("embed-fullscreen");
   } else {
+    const player = document.querySelector('.game-player');
     if (!document.fullscreenElement) {
-      frame.requestFullscreen();
+      player.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
