@@ -459,26 +459,33 @@ body.fade-out .games-overlay {
 }
 
 /* ===== WEBAPP FULLSCREEN (STABLE ORIGINAL LOGIC RESTORED) ===== */
-
 .embed-fullscreen {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100vh; /* 🔥 IMPORTANT: stable baseline */
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
-  z-index: 99997;
   background: #000;
+  z-index: 99997;
 }
 
-/* iframe takes full screen */
+/* kill layout constraints */
+.embed-fullscreen .game-player {
+  max-width: none !important;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* iframe */
 .embed-fullscreen #gameFrame {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 99998;
-  background: #000;
+  position: fixed;
+  inset: 0;
+  width: 100vw !important;
+  height: 100dvh !important;
 }
 
 /* hide UI */
@@ -486,10 +493,17 @@ body.fade-out .games-overlay {
 .embed-fullscreen footer,
 .embed-fullscreen .game-controls,
 .embed-fullscreen .games-overlay,
-.embed-fullscreen .hero > *:not(.game-player),
 .embed-fullscreen .utility-bar,
 .embed-fullscreen #nav-container {
   display: none !important;
+}
+
+/* frame reset */
+.embed-fullscreen .game-frame {
+  border: none !important;
+  box-shadow: none !important;
+  width: 100vw;
+  height: 100dvh;
 }
 
 /* exit button (ONLY ONE RULE) */
