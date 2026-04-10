@@ -57,6 +57,7 @@
 <script>
   const frame = document.getElementById("gameFrame");
   const player = document.querySelector(".game-player");
+  const exitBtn = document.getElementById("exitFullscreenBtn");
 
   function refreshGame() {
     frame.src = frame.src;
@@ -67,9 +68,11 @@
         || window.navigator.standalone === true;
   }
 
+  // ---- FULLSCREEN ----
   function toggleFullscreen() {
     if (isWebApp()) {
       document.body.classList.toggle("embed-fullscreen");
+      exitBtn.style.display = document.body.classList.contains("embed-fullscreen") ? "block" : "none";
     } else {
       if (!document.fullscreenElement) {
         player.requestFullscreen();
@@ -81,9 +84,26 @@
   }
 
   function exitFullscreenMode() {
-    document.body.classList.remove("embed-fullscreen");
+    if (isWebApp()) {
+      document.body.classList.remove("embed-fullscreen");
+      exitBtn.style.display = "none";
+    } else {
+      document.exitFullscreen();
+    }
   }
 
+  // Sync browser fullscreen state with class
+  document.addEventListener("fullscreenchange", () => {
+    if (document.fullscreenElement) {
+      player.classList.add("player-fullscreen");
+      exitBtn.style.display = "none"; // browser handles its own exit UI
+    } else {
+      player.classList.remove("player-fullscreen");
+      exitBtn.style.display = "none";
+    }
+  });
+
+  // ---- POPUP ----
   function openDeletePopup() {
     document.getElementById("deletePopup").classList.add("show");
   }
@@ -92,14 +112,17 @@
     document.getElementById("deletePopup").classList.remove("show");
   }
 
+  // ---- DELETE SAVE ----
   function confirmDelete() {
     closeDeletePopup();
-    try {
-      const win = frame.contentWindow;
-      win.localStorage.clear();
-      win.sessionStorage.clear();
-    } catch (e) {}
-    frame.src = frame.src;
+    frame.src = "about:blank";
+    setTimeout(() => {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch(e) {}
+      frame.src = frame.getAttribute("data-src");
+    }, 100);
   }
 </script>
 
