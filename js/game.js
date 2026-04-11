@@ -36,6 +36,9 @@ function toggleFullscreen() {
   if (isWebApp()) {
     const entering = !document.body.classList.contains("embed-fullscreen");
     document.body.classList.toggle("embed-fullscreen");
+    // body has padding-bottom for the utility bar — zero it in fullscreen
+    // so it doesn't leave a black bar at the bottom
+    document.body.style.paddingBottom = entering ? "0" : "";
     exitBtn.style.display = entering ? "block" : "none";
   } else {
     if (!document.fullscreenElement) {
@@ -51,20 +54,26 @@ function toggleFullscreen() {
 function exitFullscreenMode() {
   if (isWebApp()) {
     document.body.classList.remove("embed-fullscreen");
+    document.body.style.paddingBottom = "";
     exitBtn.style.display = "none";
   } else {
     document.exitFullscreen();
   }
 }
 
-// Keep exitBtn hidden while the browser's own fullscreen UI is active
+// Hide controls while in native fullscreen so the buttons don't linger over the game.
+// (.game-controls lives inside .game-player, so it enters fullscreen with it.)
+const gameControls = player.querySelector(".game-controls");
+
 document.addEventListener("fullscreenchange", () => {
   if (document.fullscreenElement) {
     player.classList.add("player-fullscreen");
     exitBtn.style.display = "none";
+    if (gameControls) gameControls.style.display = "none";
   } else {
     player.classList.remove("player-fullscreen");
     exitBtn.style.display = "none";
+    if (gameControls) gameControls.style.display = "";
   }
 });
 
