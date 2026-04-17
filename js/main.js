@@ -76,7 +76,7 @@ function showCloakBlockedPopup() {
         Not Available in Web-App Mode
       </p>
       <p style="font-size:0.9rem;color:#aaa;margin-bottom:28px;line-height:1.5;">
-        Cloak features are disabled while running as a standalone web app.
+        Cloaking is disabled in web-app mode.
       </p>
       <button id="cloak-blocked-close" style="
         padding:14px 36px;
