@@ -1,3 +1,4 @@
+/* LOADING SCREEN */
 #loading-screen {
   position: fixed;
   inset: 0;
@@ -6,10 +7,9 @@
   justify-content: center;
   align-items: center;
   z-index: 99999;
-  overflow: hidden;
 }
 
-/* Glow */
+/* glow */
 #loading-screen::before {
   content: "";
   position: absolute;
@@ -30,10 +30,9 @@
 .logo {
   font-size: 28px;
   font-weight: 600;
-  margin-bottom: 20px;
-  letter-spacing: 1px;
   color: #ff8c00;
   text-shadow: 0 0 20px rgba(255,140,0,0.6);
+  margin-bottom: 20px;
 }
 
 .spinner {
@@ -50,9 +49,10 @@
   font-size: 14px;
   opacity: 0.7;
   letter-spacing: 2px;
-  animation: fadeText 2s ease-in-out infinite;
+  animation: fadeText 2s infinite;
 }
 
+/* animations */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
