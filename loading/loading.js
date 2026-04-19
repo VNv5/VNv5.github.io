@@ -1,26 +1,29 @@
-const loader = document.createElement("div");
-loader.id = "loading-screen";
+const loader = document.getElementById("loading-screen");
+const frame = document.getElementById("gameFrame");
 
-loader.innerHTML = `
-  <div class="loader-content">
-    <div class="logo">Carey Network</div>
-    <div class="spinner"></div>
-    <div class="loading-text">Loading...</div>
-  </div>
-`;
+// read custom load time from iframe
+const loadTime = parseInt(frame.getAttribute("data-load-time")) || 1000;
 
-document.documentElement.appendChild(loader);
+let finished = false;
 
-window.addEventListener("load", () => {
-  const time = window.LOADER_TIME ?? 500; // default 0.5s
+function finish() {
+  if (finished) return;
+  finished = true;
+
+  frame.style.opacity = "1";
+
+  loader.style.opacity = "0";
+  loader.style.transition = "opacity 0.5s ease";
 
   setTimeout(() => {
-    loader.style.opacity = "0";
-    loader.style.transition = "opacity 0.5s ease";
+    loader.remove();
+  }, 500);
+}
 
-    setTimeout(() => {
-      loader.remove();
-    }, 500);
-
-  }, time);
+// when iframe loads
+frame.addEventListener("load", () => {
+  setTimeout(finish, loadTime);
 });
+
+// fallback safety (if iframe fails to fire load)
+setTimeout(finish, 8000);
