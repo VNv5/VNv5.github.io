@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
 <title>Apps - The Carey Network</title>
 
 <link rel="stylesheet" href="../css/style.css" />
@@ -14,9 +13,9 @@
 <meta name="apple-mobile-web-app-title" content="Carey Network">
 <link rel="icon" href="/images/icon.png">
 <link rel="manifest" href="/manifest.json">
-
 </head>
-<body>
+
+<body class="games-page">
 
 <header class="site-header">
   <img src="../images/logo.png" class="logo" alt="The Carey Network Logo" />
@@ -24,15 +23,31 @@
 
 <main>
   <section class="hero orange-bg">
-  <h1 class="hero-text">Coming Soon...</h1>
+
+    <div class="games-overlay">
+      <p class="games-section-label">Apps</p>
+
+      <div class="games-grid">
+
+        <!-- ROW 1 -->
+        <a href="/games/2048" class="game-card"><img src="/images/games/2048.png" alt="2048"></a>
+        <a href="/games/amongus" class="game-card"><img src="/images/games/amongus.png" alt="Among Us"></a>
+        <a href="/games/basketrandom" class="game-card"><img src="/images/games/basketrandom.png" alt="Basket Random"></a>
+        <a href="/games/bitlife" class="game-card"><img src="/images/games/bitlife.png" alt="Bitlife"></a>
+        <a href="/games/blockblast" class="game-card"><img src="/images/games/blockblast.png" alt="Block Blast"></a>
+        <a href="/games/bouncemasters" class="game-card"><img src="/images/games/bouncemasters.png" alt="Bouncemasters"></a>
+        <a href="/games/cookieclicker" class="game-card"><img src="/images/games/cookieclicker.png" alt="Cookie Clicker"></a>
+
+      </div>
+    </div>
+
   </section>
 </main>
 
-<!-- Utility Bar -->
 <div id="nav-container"></div>
 
 <footer class="site-footer">
-  <p>&copy; 2026 The Carey Network — All rights reserved.</p>
+  <p>&copy; 2026 The Carey Network</p>
 </footer>
 
 <script src="/js/main.js"></script>
