@@ -306,7 +306,7 @@ body.fade-out .games-overlay {
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 180px);
+  grid-template-columns: repeat(auto-fill, 211px);
   justify-content: center;
   gap: 16px;
   width: 100%;
@@ -395,21 +395,22 @@ body.fade-out .games-overlay {
 
 /* ---- Responsive ---- */
 @media (max-width: 1400px) {
-  .games-grid { grid-template-columns: repeat(6, 1fr); }
+  .games-grid { grid-template-columns: repeat(auto-fill, 190px); }
 }
 
 @media (max-width: 1024px) {
-  .games-grid { grid-template-columns: repeat(4, 1fr); }
+  .games-grid { grid-template-columns: repeat(auto-fill, 160px); }
   .games-page .hero.orange-bg { padding: 30px 30px 50px; }
 }
 
 @media (max-width: 640px) {
-  .games-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .games-grid { grid-template-columns: repeat(auto-fill, 120px); gap: 10px; }
 }
 
 @media (max-width: 400px) {
-  .games-grid { grid-template-columns: repeat(2, 1fr); }
+  .games-grid { grid-template-columns: repeat(auto-fill, 100px); }
 }
+
 /* ===== GAME PLAYER ===== */
 .game-player {
   width: 100%;
