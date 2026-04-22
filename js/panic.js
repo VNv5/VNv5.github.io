@@ -8,7 +8,7 @@ menu.innerHTML = `
 <div id="panic-close-btn">✕</div> <!-- ✅ ADDED -->
 
 <div>
-  <div class="panic-section">Action</div>
+  <div class="panic-section">Open</div>
   <div class="panic-options">
     <button data-action="classroom" title="Google Classroom">Class</button>
     <button data-action="slides"    title="Google Slides">Slides</button>
@@ -33,7 +33,7 @@ menu.innerHTML = `
 </div>
 
 <div class="panic-lock" id="panic-lock">
-  <span>Lock Position</span>
+  <span>Enable & Lock</span>
   <span id="lock-state">OFF</span>
 </div>
 `;
