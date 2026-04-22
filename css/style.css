@@ -306,7 +306,8 @@ body.fade-out .games-overlay {
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(auto-fill, 180px);
+  justify-content: center;
   gap: 16px;
   width: 100%;
 }
