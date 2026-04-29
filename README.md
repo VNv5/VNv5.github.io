@@ -1,2 +1,2 @@
 wsg this is just a small project of mine
-if you're a carey opp leave
+btw im not responsible if you fet in trouble for using this i kind just made this for fun because i was bored and i update it occasionally
