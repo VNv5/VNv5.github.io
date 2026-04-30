@@ -44,16 +44,16 @@ function openPanel(type) {
       <p class="panel-hint">Select an app icon style.</p>
       <div class="cloak-grid">
         <div class="cloak-option" onclick="setCloak('classroom')">
-          <img src="/images/classroom.png" /><span>Classroom</span>
+          <img src="/images/cloak/classroom.png" /><span>Classroom</span>
         </div>
         <div class="cloak-option" onclick="setCloak('docs')">
-          <img src="/images/docs.png" /><span>Docs</span>
+          <img src="/images/cloak/docs.png" /><span>Docs</span>
         </div>
         <div class="cloak-option" onclick="setCloak('slides')">
-          <img src="/images/slides.png" /><span>Slides</span>
+          <img src="/images/cloak/slides.png" /><span>Slides</span>
         </div>
         <div class="cloak-option" onclick="setCloak('drive')">
-          <img src="/images/drive.png" /><span>Drive</span>
+          <img src="/images/cloak/drive.png" /><span>Drive</span>
         </div>
       </div>
       <button class="panel-reset" onclick="resetCloak()">Reset</button>
