@@ -13,7 +13,7 @@
   box-shadow: 0 0 20px rgba(230,92,0,0.3);
 }
 
-/* ===== SETTING CARDS — match settings page exactly ===== */
+/* ===== SETTING CARDS ===== */
 .setting-card {
   background: rgba(17,17,17,0.75);
   border-radius: 18px;
@@ -36,7 +36,6 @@
   box-shadow: 0 0 12px #e65c00, 0 0 25px rgba(230,92,0,0.5);
 }
 
-/* h3 subheader — matches settings page style */
 .setting-card h3 {
   font-size: 1rem;
   font-weight: 700;
@@ -45,7 +44,6 @@
   margin: 0;
 }
 
-/* button — matches .setting-card:first-child button in style.css */
 .setting-card button {
   background: #e65c00;
   color: #fff;
@@ -95,6 +93,7 @@
   box-shadow: 0 0 30px #e65c00;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .extras-header {
@@ -114,6 +113,7 @@
 .extras-body {
   margin-top: 15px;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
@@ -182,6 +182,7 @@
   margin-top: 10px;
   outline: none;
   transition: 0.25s;
+  box-sizing: border-box;
 }
 
 .panel-input:focus {
@@ -203,6 +204,7 @@
   cursor: pointer;
   box-shadow: 0 0 10px #e65c00;
   transition: 0.25s;
+  box-sizing: border-box;
 }
 
 .panel-btn:hover {
@@ -221,6 +223,7 @@
   color: #aaa;
   cursor: pointer;
   transition: 0.25s;
+  box-sizing: border-box;
 }
 
 .panel-reset:hover {
@@ -228,7 +231,7 @@
   border-color: #e65c00;
 }
 
-/* ===== CODE OUTPUT ===== */
+/* ===== CODE OUTPUT — hidden until it has content ===== */
 .code-output {
   display: none;
   margin-top: 10px;
@@ -238,6 +241,7 @@
   font-size: 0.82rem;
   white-space: pre-wrap;
   word-break: break-all;
+  box-sizing: border-box;
 }
 
 .code-output:not(:empty) {
