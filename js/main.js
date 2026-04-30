@@ -1,3 +1,37 @@
+/* ===== CLOAK RESTORE — runs on every page before anything else ===== */
+(function () {
+  const name = localStorage.getItem("appName");
+  const icon = localStorage.getItem("appIcon");
+  if (!name && !icon) return;
+
+  if (name) document.title = name;
+
+  if (icon) {
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) favicon.href = icon;
+
+    const apple = document.querySelector("link[rel='apple-touch-icon']");
+    if (apple) apple.href = icon;
+
+    const manifest = {
+      name:             name || "The Carey Network",
+      short_name:       name || "Carey Network",
+      start_url:        "/",
+      display:          "standalone",
+      background_color: "#111111",
+      theme_color:      "#e65c00",
+      icons: [
+        { src: icon, sizes: "192x192", type: "image/png" },
+        { src: icon, sizes: "512x512", type: "image/png" }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const link = document.querySelector("link[rel='manifest']");
+    if (link) link.href = url;
+  }
+})();
+
 /* ===== NAV ===== */
 async function loadNav() {
   const res  = await fetch("/components/nav.html");
@@ -11,7 +45,6 @@ async function loadNav() {
     if (iconPath === currentPath) icon.classList.add("active");
   });
 
-  // Called here ONLY — after nav is injected so all links exist
   setupTransitions();
 }
 
@@ -20,7 +53,7 @@ function setupTransitions() {
   document.querySelectorAll("a").forEach(link => {
     if (link.hostname !== window.location.hostname) return;
 
-    link.addEventListener("click", function(e) {
+    link.addEventListener("click", function (e) {
       const target  = this.href;
       const current = window.location.href;
 
@@ -31,7 +64,6 @@ function setupTransitions() {
       document.body.classList.remove("fade-in");
       document.body.classList.add("fade-out");
 
-      // 🔥 shortened from 500 → 300
       setTimeout(() => {
         window.location.href = target;
       }, 300);
@@ -41,7 +73,7 @@ function setupTransitions() {
 
 /* ===== WEB APP DETECTION ===== */
 function detectWebAppMode() {
-  return window.matchMedia('(display-mode: standalone)').matches
+  return window.matchMedia("(display-mode: standalone)").matches
       || window.navigator.standalone === true;
 }
 
@@ -126,12 +158,10 @@ function openCloak() {
 
 /* ===== AUTO CLOAK ===== */
 function maybeAutoCloak() {
-  // basic guards
   if (window !== window.top) return;
   if (localStorage.getItem("autoCloak") !== "true") return;
   if (detectWebAppMode()) return;
 
-  // wait until page fully loaded
   if (document.readyState !== "complete") {
     window.addEventListener("load", maybeAutoCloak, { once: true });
     return;
@@ -176,16 +206,11 @@ function maybeAutoCloak() {
 
   function triggerCloak(e) {
     e.preventDefault();
-
-    // remove once to avoid double dih
     overlay.removeEventListener("click", triggerCloak);
     overlay.remove();
-
-    // edge
     openCloak();
   }
 
-  // ts makes it more sigma
   overlay.addEventListener("click", triggerCloak);
 }
 
@@ -219,29 +244,29 @@ window.onload = () => {
 
   const isWebApp = detectWebAppMode();
 
-  const cloakButton      = document.querySelector('.setting-card:first-child button');
-  const autoCloakToggle  = document.querySelector('.setting-card:nth-child(2) input[type="checkbox"]');
-  const panicToggle      = document.querySelector('.setting-card:nth-child(3) input[type="checkbox"]');
-  const webAppToggle     = document.querySelector('.setting-card:nth-child(4) input[type="checkbox"]');
+  const cloakButton     = document.querySelector(".setting-card:first-child button");
+  const autoCloakToggle = document.querySelector('.setting-card:nth-child(2) input[type="checkbox"]');
+  const panicToggle     = document.querySelector('.setting-card:nth-child(3) input[type="checkbox"]');
+  const webAppToggle    = document.querySelector('.setting-card:nth-child(4) input[type="checkbox"]');
 
-  const popup        = document.getElementById('settings-popup');
-  const popupMessage = document.getElementById('popup-message');
-  const popupClose   = document.getElementById('popup-close');
+  const popup        = document.getElementById("settings-popup");
+  const popupMessage = document.getElementById("popup-message");
+  const popupClose   = document.getElementById("popup-close");
 
   function showPopup(msg) {
     if (!popup || !popupMessage) return;
     popupMessage.textContent = msg;
-    popup.classList.add('show');
+    popup.classList.add("show");
   }
 
-  if (popupClose) popupClose.addEventListener('click', () => popup.classList.remove('show'));
+  if (popupClose) popupClose.addEventListener("click", () => popup.classList.remove("show"));
 
   if (isWebApp) {
     if (webAppToggle) {
       webAppToggle.checked  = true;
       webAppToggle.disabled = true;
-      webAppToggle.addEventListener('click', () => {
-        showPopup('Web-App Mode cannot be turned off while in standalone mode.');
+      webAppToggle.addEventListener("click", () => {
+        showPopup("Web-App Mode cannot be turned off while in standalone mode.");
       });
     }
   } else if (webAppToggle) {
@@ -251,11 +276,11 @@ window.onload = () => {
 
   [cloakButton, autoCloakToggle].forEach(el => {
     if (!el) return;
-    el.addEventListener('click', e => {
+    el.addEventListener("click", e => {
       if (webAppToggle?.checked) {
         e.preventDefault();
-        if (el.type === 'checkbox') el.checked = false;
-        showPopup('This Setting Cannot Be Activated Due To Web-App Mode');
+        if (el.type === "checkbox") el.checked = false;
+        showPopup("This Setting Cannot Be Activated Due To Web-App Mode");
       }
     });
   });
@@ -274,7 +299,7 @@ window.onload = () => {
 
   if (panicToggle) {
     panicToggle.checked = localStorage.getItem("panicEnabled") === "true";
-    panicToggle.addEventListener('change', () => {
+    panicToggle.addEventListener("change", () => {
       localStorage.setItem("panicEnabled", panicToggle.checked);
       if (panicToggle.checked) {
         loadPanicButton();
